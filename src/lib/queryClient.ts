@@ -1,5 +1,6 @@
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister'
 import { QueryClient } from '@tanstack/react-query'
+import { persistQueryClientSave } from '@tanstack/react-query-persist-client'
 import { del, get, set } from 'idb-keyval'
 import { env } from './env'
 import { isAuthError, isNetworkError } from './errors'
@@ -52,7 +53,7 @@ export const persister = createAsyncStoragePersister({
     setItem: (key, value) => set(key, value),
     removeItem: (key) => del(key),
   },
-  throttleTime: 1000,
+  throttleTime: 250,
 })
 
 export const persistOptions = {
@@ -60,9 +61,29 @@ export const persistOptions = {
   maxAge: 7 * 24 * 60 * 60 * 1000,
   buster: env.appVersion,
   dehydrateOptions: {
-    shouldDehydrateQuery: (query: { queryKey: readonly unknown[]; state: { status: string } }) =>
-      query.state.status === 'success' && PERSISTED_KEYS.has(String(query.queryKey[0])),
+    // Guarda toda consulta que tenha dados, inclusive as que falharam na última
+    // tentativa (ex.: sem internet): os dados anteriores continuam válidos para
+    // consulta offline.
+    shouldDehydrateQuery: (query: { queryKey: readonly unknown[]; state: { data: unknown } }) =>
+      query.state.data !== undefined && PERSISTED_KEYS.has(String(query.queryKey[0])),
   },
+}
+
+/**
+ * Grava o cache agora, sem esperar o intervalo normal. Chamado quando o app
+ * vai para segundo plano ou é fechado (o sistema pode encerrá-lo a seguir).
+ */
+export function flushPersistedCache(): Promise<void> {
+  return persistQueryClientSave({ queryClient, ...persistOptions })
+}
+
+if (typeof window !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') void flushPersistedCache()
+  })
+  window.addEventListener('pagehide', () => void flushPersistedCache())
+  // Ao reconectar, confere tudo com o servidor (inclusive o que parecia recente).
+  window.addEventListener('online', () => void queryClient.invalidateQueries())
 }
 
 /** Apaga o cache local (ao sair da conta). */

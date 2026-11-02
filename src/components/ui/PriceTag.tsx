@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { type Decimalish, roundCents, toBig } from '@/lib/decimal'
+import { formatMoney } from '@/lib/format'
 import { cn } from './cn'
 
 /**
@@ -36,7 +37,8 @@ export function PriceTag({
       )}
     >
       {label && <span className="text-[0.8125rem] font-semibold leading-tight opacity-80">{label}</span>}
-      <span className="flex items-start font-tag font-bold leading-none tabular" aria-label={label ? undefined : `R$ ${integer},${cents}`}>
+      <span className="sr-only">{formatMoney(value ?? 0)}</span>
+      <span className="flex items-start font-tag font-bold leading-none tabular" aria-hidden>
         <span className={cn(small, 'mr-1 mt-[0.35em] font-semibold')}>R$</span>
         <span className={cn(big, 'tracking-tight')}>{integer}</span>
         <span className={cn(small, 'mt-[0.2em]')}>,{cents}</span>

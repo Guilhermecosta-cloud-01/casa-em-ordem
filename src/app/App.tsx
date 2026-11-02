@@ -13,7 +13,15 @@ import { ConfigMissing } from './Splash'
 export function App() {
   if (!env.configured) return <ConfigMissing />
   return (
-    <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={persistOptions}
+      // O cache do aparelho aparece na hora, mas é sempre conferido com o
+      // servidor logo depois (nunca é tratado como atualizado só por ser recente).
+      onSuccess={() => {
+        if (navigator.onLine) void queryClient.invalidateQueries()
+      }}
+    >
       <ToastProvider>
         <ConfirmProvider>
           <AuthProvider>

@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useToast } from '@/components/ui/Toast'
 import { env } from '@/lib/env'
 import { errorMessage } from '@/lib/errors'
 import { newId } from '@/lib/id'
-import { useOutbox } from '@/lib/sync/hooks'
+import { useOnline, useOutbox } from '@/lib/sync/hooks'
 import { useUser } from '@/modules/auth/AuthProvider'
-import { useActiveFamily } from '@/modules/family/FamilyProvider'
+import { useActiveFamily, useFamily } from '@/modules/family/FamilyProvider'
 import * as api from './api'
 import {
   applyPendingItemOps,
@@ -53,12 +53,24 @@ export function useList(listId: string | undefined) {
  */
 export function useListItems(listId: string | undefined) {
   const live = useListRealtime(listId)
+  const online = useOnline()
   const query = useQuery({
     queryKey: itemsKey(listId ?? ''),
     queryFn: () => api.fetchItems(listId!),
     enabled: Boolean(listId),
-    refetchInterval: live === 'live' ? false : env.syncPollMs,
+    // Sem Realtime, consulta periodicamente; sem internet, não adianta tentar.
+    refetchInterval: live === 'live' || !online ? false : env.syncPollMs,
   })
+  const { ensureMembers } = useFamily()
+  useEffect(() => {
+    const ids = new Set<string>()
+    for (const item of query.data ?? []) {
+      if (item.created_by) ids.add(item.created_by)
+      if (item.updated_by) ids.add(item.updated_by)
+      if (item.purchased_by) ids.add(item.purchased_by)
+    }
+    ensureMembers(ids)
+  }, [query.data, ensureMembers])
   const outbox = useOutbox()
   const ops = useMemo(
     () => (listId ? outbox.ops.filter((op) => op.scope === listScope(listId)) : []),

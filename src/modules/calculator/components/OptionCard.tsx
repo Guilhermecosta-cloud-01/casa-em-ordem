@@ -43,9 +43,10 @@ export function OptionCard({
           </IconButton>
         )}
       </div>
-      <div className="mt-3 grid grid-cols-[1.1fr_1fr_auto] items-start gap-2">
+      <p className="mt-1 text-sm text-ink-2">Preço e conteúdo de uma embalagem</p>
+      <div className="mt-2 grid grid-cols-[1.1fr_1fr_auto] items-start gap-2">
         <MoneyField
-          label="Preço da embalagem"
+          label="Preço"
           value={option.price}
           onChange={(e) => set('price', e.target.value)}
           error={evaluation?.errors.price}
@@ -74,10 +75,10 @@ export function OptionCard({
         type="button"
         onClick={() => setDetails((v) => !v)}
         aria-expanded={details}
-        className="mt-3 inline-flex min-h-10 items-center gap-1 font-semibold text-pen"
+        className="mt-3 inline-flex min-h-10 items-center gap-1 text-left font-semibold text-pen"
       >
-        <ChevronDown className={cn('size-5 transition-transform', details && 'rotate-180')} aria-hidden />
-        Nome, marca e quantidade de embalagens
+        <ChevronDown className={cn('size-5 shrink-0 transition-transform', details && 'rotate-180')} aria-hidden />
+        Nome, marca e embalagens
       </button>
       {details && (
         <div className="mt-2 grid grid-cols-2 gap-2">

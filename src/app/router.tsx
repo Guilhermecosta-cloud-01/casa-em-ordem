@@ -8,6 +8,7 @@ import { ListsPage } from '@/modules/shopping/pages/ListsPage'
 import { AppLayout } from './AppLayout'
 import { RequireAuth, RequireFamily } from './guards'
 import { NotFoundPage, RouteErrorPage } from './NotFound'
+import { Splash } from './Splash'
 
 // Telas principais (lista de compras) carregam junto com o app; as demais,
 // sob demanda. O service worker guarda todas para uso offline.
@@ -54,6 +55,7 @@ const appRoutes: RouteObject[] = [
 export const router = createBrowserRouter([
   {
     errorElement: <RouteErrorPage />,
+    HydrateFallback: Splash,
     children: [
       { path: 'entrar', element: <SignInPage /> },
       { path: 'criar-conta', element: <SignUpPage /> },

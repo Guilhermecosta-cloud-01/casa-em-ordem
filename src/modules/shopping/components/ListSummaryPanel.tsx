@@ -47,9 +47,8 @@ export function ListSummaryPanel({
           <dt className="text-ink-2">Falta comprar</dt>
           <dd className="font-tag text-xl font-semibold tabular">{formatMoney(totals.pending)}</dd>
         </div>
-        <div className="col-span-2">
-          <dt className="sr-only">Orçamento</dt>
-          <dd>
+      </dl>
+      <div className="mt-3">
             <button
               type="button"
               onClick={onEditBudget}
@@ -76,9 +75,7 @@ export function ListSummaryPanel({
               )}
               <Pencil className="size-4 shrink-0 text-pen" aria-hidden />
             </button>
-          </dd>
-        </div>
-      </dl>
+      </div>
 
       {totals.unpricedCount > 0 && (
         <p className="mt-3 text-sm text-ink-2">

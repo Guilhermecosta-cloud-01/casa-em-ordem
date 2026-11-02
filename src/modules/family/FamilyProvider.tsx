@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useOnline } from '@/lib/sync/hooks'
 import { useAuth } from '@/modules/auth/AuthProvider'
 import { fetchMembers, fetchMemberships, fetchProfile, type FamilyRole, type Member, type Membership } from './api'
 
@@ -15,15 +16,21 @@ interface FamilyContextValue {
   /** Nome para exibir; "Você" para a própria pessoa. */
   nameOf: (userId: string | null | undefined, options?: { you?: boolean | 'lower' }) => string
   avatarOf: (userId: string | null | undefined) => string | null
+  /** Recarrega os integrantes se aparecer alguém desconhecido (ex.: entrou agora). */
+  ensureMembers: (userIds: Iterable<string>) => void
   refetch: () => Promise<unknown>
 }
 
 const FamilyContext = createContext<FamilyContextValue | null>(null)
 
+// Momento em que o app abriu: dados restaurados do aparelho são anteriores a ele.
+const SESSION_START = Date.now()
+
 const storageKey = (userId: string) => `casa-em-ordem-family:${userId}`
 
 export function FamilyProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
+  const online = useOnline()
   const queryClient = useQueryClient()
   const userId = user?.id ?? null
 
@@ -114,10 +121,29 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
     [memberMap, userId, profileQuery.data],
   )
 
+  const lastMembersRefresh = useRef(0)
+  const ensureMembers = useCallback(
+    (ids: Iterable<string>) => {
+      if (!familyId || !membersQuery.data) return
+      const unknown = [...ids].some((id) => !memberMap.has(id))
+      if (!unknown || Date.now() - lastMembersRefresh.current < 20_000) return
+      lastMembersRefresh.current = Date.now()
+      void queryClient.invalidateQueries({ queryKey: ['members', familyId] })
+    },
+    [familyId, membersQuery.data, memberMap, queryClient],
+  )
+
   const value = useMemo<FamilyContextValue>(
     () => ({
       memberships,
-      loading: membershipsQuery.isPending,
+      // "Sem família" só é conclusivo com resposta do servidor nesta sessão
+      // (ou sem internet): um cache antigo poderia levar ao cadastro à toa.
+      loading:
+        membershipsQuery.isPending ||
+        (memberships.length === 0 &&
+          online &&
+          !membershipsQuery.isError &&
+          membershipsQuery.dataUpdatedAt < SESSION_START),
       error: membershipsQuery.error,
       family: current?.family ? { id: current.family.id, name: current.family.name } : null,
       role: current?.role ?? null,
@@ -126,6 +152,7 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
       setActiveFamily,
       nameOf,
       avatarOf,
+      ensureMembers,
       refetch: () =>
         Promise.all([
           membershipsQuery.refetch(),
@@ -133,7 +160,7 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
           queryClient.invalidateQueries({ queryKey: ['profile'] }),
         ]),
     }),
-    [memberships, membershipsQuery, current, members, setActiveFamily, nameOf, avatarOf, queryClient],
+    [memberships, membershipsQuery, current, members, setActiveFamily, nameOf, avatarOf, ensureMembers, queryClient, online],
   )
 
   return <FamilyContext.Provider value={value}>{children}</FamilyContext.Provider>

@@ -1,0 +1,168 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------------
+   Casa em Ordem — identidade visual
+   Papel de bloco (fundo frio), tinta de caneta azul (texto e ações),
+   amarelo de etiqueta de gôndola (só para valores que importam) e verde
+   de feira (itens comprados).
+   ------------------------------------------------------------------------ */
+
+@theme {
+  --font-sans: 'Atkinson Hyperlegible Next Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-tag: 'Barlow Condensed', 'Arial Narrow', ui-sans-serif, sans-serif;
+
+  --color-paper: #f4f6f8;
+  --color-card: #ffffff;
+  --color-ink: #16213b;
+  --color-ink-2: #46526e;
+  --color-ink-3: #66708a;
+  --color-line: #dde2ea;
+  --color-line-strong: #c3cad7;
+
+  --color-pen: #2340a8;
+  --color-pen-hover: #1b338c;
+  --color-pen-soft: #e8edfb;
+  --color-pen-line: #c6d1f3;
+
+  --color-tag: #ffd84a;
+  --color-tag-edge: #e9b800;
+  --color-tag-ink: #2a2100;
+
+  --color-leaf: #1d7549;
+  --color-leaf-soft: #e2f2e9;
+
+  --color-alert: #b42318;
+  --color-alert-soft: #fdecea;
+
+  --color-amber: #8f5300;
+  --color-amber-soft: #fff3d6;
+
+  --radius-chip: 999px;
+  --radius-field: 12px;
+  --radius-panel: 18px;
+  --radius-sheet: 22px;
+
+  --shadow-float: 0 10px 30px -12px rgb(22 33 59 / 0.35);
+  --shadow-sheet: 0 -12px 40px -16px rgb(22 33 59 / 0.35);
+
+  --animate-sheet-in: sheet-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-fade-in: fade-in 160ms ease-out;
+
+  @keyframes sheet-in {
+    from {
+      transform: translateY(24px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  body {
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-pen);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Números alinhados em colunas de valores */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  dialog::backdrop {
+    background: rgb(22 33 59 / 0.45);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      transition-duration: 1ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Rótulo dos campos */
+  .field-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 650;
+    color: var(--color-ink);
+    margin-bottom: 0.375rem;
+  }
+
+  .field-input {
+    width: 100%;
+    min-height: 3rem;
+    border-radius: var(--radius-field);
+    border: 1.5px solid var(--color-line-strong);
+    background: var(--color-card);
+    padding: 0.625rem 0.875rem;
+    font-size: 1rem;
+    line-height: 1.4;
+    transition: border-color 120ms;
+  }
+  .field-input::placeholder {
+    color: var(--color-ink-3);
+  }
+  .field-input:focus {
+    outline: none;
+    border-color: var(--color-pen);
+    box-shadow: 0 0 0 3px var(--color-pen-soft);
+  }
+  .field-input[aria-invalid='true'] {
+    border-color: var(--color-alert);
+  }
+  .field-input:disabled {
+    background: var(--color-paper);
+    color: var(--color-ink-3);
+  }
+
+  /* Linhas de pauta do bloco de compras: cada item é uma linha, não um cartão */
+  .ruled > * + * {
+    border-top: 1px solid var(--color-line);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}

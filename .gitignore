@@ -1,0 +1,17 @@
+node_modules
+dist
+dev-dist
+*.local
+.env
+.env.*
+!.env.example
+coverage
+playwright-report
+test-results
+.local-stack
+*.log
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+supabase/.branches
+supabase/.temp

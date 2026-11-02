@@ -1,0 +1,56 @@
+{
+  "name": "casa-em-ordem",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Aplicativo de organização familiar: listas de compras compartilhadas, calculadora de custo-benefício e histórico de preços.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:db": "vitest run --config vitest.db.config.ts",
+    "test:e2e": "playwright test",
+    "stack:up": "bash scripts/local-stack/up.sh",
+    "stack:down": "bash scripts/local-stack/down.sh",
+    "icons": "node scripts/generate-icons.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/atkinson-hyperlegible-next": "^5.3.0",
+    "@fontsource/barlow-condensed": "^5.3.0",
+    "@supabase/supabase-js": "^2.118.0",
+    "@tanstack/query-async-storage-persister": "^5.105.2",
+    "@tanstack/react-query": "^5.105.2",
+    "@tanstack/react-query-persist-client": "^5.105.2",
+    "big.js": "^7.0.1",
+    "idb-keyval": "^6.3.0",
+    "lucide-react": "^1.66.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router": "^8.5.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/big.js": "^7.0.0",
+    "@types/node": "^22.20.5",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "jose": "^6.2.15",
+    "pg": "^8.23.1",
+    "sharp": "^0.35.5",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.5",
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.1.0",
+    "workbox-window": "^7.4.1"
+  }
+}

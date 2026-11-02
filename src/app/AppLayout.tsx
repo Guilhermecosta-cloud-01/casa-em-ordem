@@ -26,7 +26,7 @@ function BottomNav() {
   return (
     <nav
       aria-label="Navegação principal"
-      className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-line bg-card/95 backdrop-blur lg:hidden"
+      className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-line bg-card lg:hidden"
     >
       <ul className="mx-auto grid max-w-xl grid-cols-5">
         {NAV_MODULES.map((module) => (
@@ -127,7 +127,7 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        'safe-top sticky top-0 z-20 border-b border-transparent bg-paper/90 backdrop-blur supports-[backdrop-filter]:bg-paper/75',
+        'safe-top sticky top-0 z-20 border-b border-transparent bg-paper',
         className,
       )}
     >

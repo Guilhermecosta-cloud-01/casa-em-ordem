@@ -193,11 +193,11 @@ export function FamilyPage() {
                   >
                     <Avatar name={nameOf(member.user_id, { you: false })} src={member.profile?.avatar_data} seed={member.user_id} />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold">
-                        {nameOf(member.user_id, { you: false })}
-                        {isMe && <span className="font-normal text-ink-2"> (você)</span>}
+                      <span className="block truncate font-semibold">{nameOf(member.user_id, { you: false })}</span>
+                      <span className="text-sm text-ink-2">
+                        {isMe ? 'Você, desde ' : 'Desde '}
+                        {formatDate(member.joined_at)}
                       </span>
-                      <span className="text-sm text-ink-2">desde {formatDate(member.joined_at)}</span>
                     </span>
                     {member.role === 'admin' ? <Badge tone="pen">Administrador</Badge> : <Badge>Integrante</Badge>}
                     {isAdmin && !isMe && <ChevronRight className="size-5 text-ink-3" aria-hidden />}

@@ -80,8 +80,12 @@ export function HomePage() {
             </ButtonLink>
           </section>
         ) : (
-          <EmptyState title="Comece pela primeira lista">
-            <p>Escolha um modelo ou crie do seu jeito. Toda a família vê e edita a mesma lista.</p>
+          <EmptyState title={lastPurchase ? 'Nenhuma lista ativa' : 'Comece pela primeira lista'}>
+            <p>
+              {lastPurchase
+                ? 'Crie a próxima lista ou repita uma compra pelo histórico.'
+                : 'Escolha um modelo ou crie do seu jeito. Toda a família vê e edita a mesma lista.'}
+            </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {LIST_TEMPLATES.slice(0, 5).map((t) => (
                 <Chip key={t} onClick={() => setCreating(t)}>

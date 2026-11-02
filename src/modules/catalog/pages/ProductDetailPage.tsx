@@ -261,7 +261,7 @@ function ProductDetail({ product }: { product: Product }) {
                   <tr key={r.id} className="border-b border-line last:border-0 align-top">
                     <td className="px-4 py-3">
                       <span className="block tabular">{formatDate(r.recorded_on)}</span>
-                      <span className="text-sm text-ink-2">{r.source === 'purchase' ? 'compra' : `por ${nameOf(r.created_by)}`}</span>
+                      <span className="text-sm text-ink-2">{r.source === 'purchase' ? 'compra' : `por ${nameOf(r.created_by, { you: 'lower' })}`}</span>
                     </td>
                     <td className="px-2 py-3">
                       <span className="block font-semibold tabular">{formatMoney(r.price)}</span>
@@ -292,7 +292,7 @@ function ProductDetail({ product }: { product: Product }) {
             {product.package_size !== null ? formatAmount(product.package_size, product.unit) : `por ${product.unit === 'un' ? 'unidade' : product.unit}`}
           </p>
           {product.notes && <p className="mt-1">{product.notes}</p>}
-          <p className="mt-1 text-sm text-ink-3">Atualizado em {formatDate(product.updated_at)} por {nameOf(product.updated_by)}.</p>
+          <p className="mt-1 text-sm text-ink-3">Atualizado em {formatDate(product.updated_at)} por {nameOf(product.updated_by, { you: 'lower' })}.</p>
         </section>
       </PageBody>
 

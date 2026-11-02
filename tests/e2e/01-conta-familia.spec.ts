@@ -58,7 +58,7 @@ test('2. cria família, convida outra pessoa e o convite vale uma vez só', asyn
   await b.waitForURL((url) => url.pathname === '/')
   await b.goto('/familia')
   await expect(b.getByText('Marta Lima')).toBeVisible()
-  await expect(b.getByText('Pedro Lima (você)')).toBeVisible()
+  await expect(b.getByText('Você, desde', { exact: false })).toBeVisible()
   // Integrante comum não vê o botão de convite.
   await expect(b.getByRole('button', { name: 'Convidar' })).toHaveCount(0)
 

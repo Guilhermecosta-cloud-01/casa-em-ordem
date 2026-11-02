@@ -172,7 +172,9 @@ export function PriceRecordSheet({
     setUnit(stats?.last_unit ?? product.unit)
     setQuantity(formatNumberInput(stats ? stats.last_quantity : product.package_size))
     setBasis(stats?.last_price_basis ?? 'package')
-    setStoreId(stats?.last_store_id ?? '')
+    // Não pré-seleciona o último estabelecimento: atribuir um preço ao lugar
+    // errado distorceria as comparações.
+    setStoreId('')
     setNewStore('')
     setDate(todayIso())
     setNotes('')

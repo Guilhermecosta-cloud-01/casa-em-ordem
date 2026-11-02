@@ -166,7 +166,7 @@ function PurchaseDetail({ purchase }: { purchase: Purchase }) {
             </Notice>
           )}
           {purchase.notes && <p className="mt-4 text-ink-2">{purchase.notes}</p>}
-          <p className="mt-3 text-sm text-ink-3">Registrada por {nameOf(purchase.created_by)}.</p>
+          <p className="mt-3 text-sm text-ink-3">Registrada por {nameOf(purchase.created_by, { you: 'lower' })}.</p>
         </section>
 
         <section aria-labelledby="items-title">

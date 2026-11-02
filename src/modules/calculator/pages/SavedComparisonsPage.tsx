@@ -91,7 +91,7 @@ export function SavedComparisonsPage() {
                     <p className="truncate font-semibold">{c.title || 'Comparação'}</p>
                     {c.summary && <p className="mt-0.5 line-clamp-2 text-sm text-ink-2">{c.summary}</p>}
                     <p className="mt-1 text-xs text-ink-3">
-                      {formatDate(c.created_at)}, por {nameOf(c.created_by)}
+                      {formatDate(c.created_at)}, por {nameOf(c.created_by, { you: 'lower' })}
                     </p>
                   </Link>
                   <IconButton label="Excluir comparação" tone="danger" onClick={() => void remove(c)}>

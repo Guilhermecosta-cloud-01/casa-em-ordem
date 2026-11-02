@@ -1,17 +1,34 @@
-import { useMemo, useRef, useState } from 'react'
+import { useLayoutEffect, useMemo, useState } from 'react'
 import { toBig } from '@/lib/decimal'
 import { formatDate, formatDateShort, formatMoney, parseLocalDate } from '@/lib/format'
+import { axisMoneyFormatter, niceScale } from '../domain/chartScale'
 import { refUnitLabel } from '../domain/priceStats'
 import type { PriceRecord } from '../types'
 
-const WIDTH = 640
 const HEIGHT = 200
-const PAD = { top: 16, right: 16, bottom: 28, left: 56 }
+const FONT = 12
+const PAD = { top: 12, right: 12, bottom: 30 }
+
+/** Largura real do elemento, para desenhar o gráfico em pixels (texto sempre com 12 px). */
+function useElementWidth(element: HTMLElement | null) {
+  const [width, setWidth] = useState(0)
+  useLayoutEffect(() => {
+    if (!element) return
+    setWidth(Math.round(element.getBoundingClientRect().width))
+    const observer = new ResizeObserver((entries) => {
+      const next = entries[0]?.contentRect.width
+      if (next) setWidth(Math.round(next))
+    })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [element])
+  return width
+}
 
 /**
  * Evolução do preço (por kg, L ou unidade) ao longo do tempo. Uma série só:
- * o título já diz o que é, então não há legenda. A lista de registros logo
- * abaixo funciona como tabela com os mesmos dados.
+ * o título já diz o que é, então não há legenda. O histórico logo abaixo
+ * funciona como tabela com os mesmos dados.
  */
 export function PriceChart({
   records,
@@ -22,109 +39,110 @@ export function PriceChart({
   refUnit: string
   storeName: (id: string | null) => string | null
 }) {
-  const svgRef = useRef<SVGSVGElement>(null)
+  // Ref por estado: a medição acontece sempre que a área do gráfico aparece.
+  const [box, setBox] = useState<HTMLDivElement | null>(null)
+  const width = useElementWidth(box)
   const [active, setActive] = useState<number | null>(null)
 
-  const points = useMemo(() => {
-    const sorted = [...records]
+  const series = useMemo(() => {
+    const ordered = [...records]
       .filter((r) => r.ref_unit === refUnit)
       .sort((a, b) => (a.recorded_on === b.recorded_on ? (a.created_at < b.created_at ? -1 : 1) : a.recorded_on < b.recorded_on ? -1 : 1))
-    if (sorted.length < 2) return []
-    const times = sorted.map((r) => parseLocalDate(r.recorded_on).getTime())
-    const values = sorted.map((r) => Number(toBig(r.normalized_price).toString()))
-    const tMin = Math.min(...times)
-    const tMax = Math.max(...times)
-    const vMin = Math.min(...values)
-    const vMax = Math.max(...values)
-    const vPad = vMax === vMin ? Math.max(vMax * 0.1, 1) : (vMax - vMin) * 0.15
-    const lo = Math.max(0, vMin - vPad)
-    const hi = vMax + vPad
-    const x = (t: number) =>
-      tMax === tMin ? (PAD.left + WIDTH - PAD.right) / 2 : PAD.left + ((t - tMin) / (tMax - tMin)) * (WIDTH - PAD.left - PAD.right)
-    const y = (v: number) => PAD.top + (1 - (v - lo) / (hi - lo)) * (HEIGHT - PAD.top - PAD.bottom)
-    return sorted.map((record, i) => ({
+    // Vários registros no mesmo dia viram um ponto só: o último anotado.
+    const byDay = new Map<string, PriceRecord>()
+    for (const record of ordered) byDay.set(record.recorded_on, record)
+    return [...byDay.values()].map((record) => ({
       record,
-      x: x(times[i]!),
-      y: y(values[i]!),
-      value: values[i]!,
-      ticks: { lo, hi, y },
+      time: parseLocalDate(record.recorded_on).getTime(),
+      value: Number(toBig(record.normalized_price).toString()),
     }))
   }, [records, refUnit])
 
-  if (points.length < 2) return null
-  const { lo, hi, y } = points[0]!.ticks
-  const gridValues = [lo, (lo + hi) / 2, hi]
+  if (series.length < 2) return null
+
+  const scale = niceScale(series.map((p) => p.value))
+  const label = axisMoneyFormatter(scale.step)
+  const tickLabels = scale.ticks.map(label)
+  // Espaço à esquerda para o rótulo mais longo (estimativa de 7 px por caractere).
+  const left = Math.max(...tickLabels.map((t) => t.length)) * 7 + 10
+  const plotRight = Math.max(width - PAD.right, left + 1)
+  const tMin = series[0]!.time
+  const tMax = series[series.length - 1]!.time
+  const x = (t: number) => (tMax === tMin ? (left + plotRight) / 2 : left + ((t - tMin) / (tMax - tMin)) * (plotRight - left))
+  const y = (v: number) => PAD.top + (1 - (v - scale.lo) / (scale.hi - scale.lo)) * (HEIGHT - PAD.top - PAD.bottom)
+  const points = series.map((p) => ({ ...p, x: x(p.time), y: y(p.value) }))
   const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
   const first = points[0]!
   const last = points[points.length - 1]!
   const shown = active !== null ? points[active] : null
 
   function pick(clientX: number) {
-    const svg = svgRef.current
-    if (!svg) return
-    const rect = svg.getBoundingClientRect()
-    const vx = ((clientX - rect.left) / rect.width) * WIDTH
+    if (!box) return
+    const px = clientX - box.getBoundingClientRect().left
     let best = 0
     for (let i = 1; i < points.length; i += 1) {
-      if (Math.abs(points[i]!.x - vx) < Math.abs(points[best]!.x - vx)) best = i
+      if (Math.abs(points[i]!.x - px) < Math.abs(points[best]!.x - px)) best = i
     }
     setActive(best)
   }
 
-  const summary = `Preço por ${refUnitLabel(refUnit)} de ${formatMoney(first.value)} em ${formatDate(first.record.recorded_on)} para ${formatMoney(last.value)} em ${formatDate(last.record.recorded_on)}, em ${points.length} registros.`
+  const summary = `Preço por ${refUnitLabel(refUnit)} de ${formatMoney(first.value)} em ${formatDate(first.record.recorded_on)} para ${formatMoney(last.value)} em ${formatDate(last.record.recorded_on)}, em ${points.length} datas.`
 
   return (
     <figure className="rounded-[var(--radius-panel)] bg-card p-4 ring-1 ring-line">
       <figcaption className="font-semibold">Evolução do preço por {refUnitLabel(refUnit)}</figcaption>
-      <div className="relative mt-2">
-        <svg
-          ref={svgRef}
-          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-          className="h-auto w-full touch-pan-y select-none"
-          role="img"
-          aria-label={summary}
-          onPointerMove={(e) => pick(e.clientX)}
-          onPointerDown={(e) => pick(e.clientX)}
-          onPointerLeave={(e) => {
-            if (e.pointerType === 'mouse') setActive(null)
-          }}
-        >
-          {gridValues.map((v) => (
-            <g key={v}>
-              <line x1={PAD.left} x2={WIDTH - PAD.right} y1={y(v)} y2={y(v)} stroke="var(--color-line)" strokeWidth={1} />
-              <text x={PAD.left - 8} y={y(v) + 4} textAnchor="end" fontSize={12} fill="var(--color-ink-2)" className="tabular">
-                {formatMoney(v)}
-              </text>
-            </g>
-          ))}
-          <text x={first.x} y={HEIGHT - 8} textAnchor="start" fontSize={12} fill="var(--color-ink-2)">
-            {formatDateShort(first.record.recorded_on)}
-          </text>
-          <text x={last.x} y={HEIGHT - 8} textAnchor="end" fontSize={12} fill="var(--color-ink-2)">
-            {formatDateShort(last.record.recorded_on)}
-          </text>
-          {shown && (
-            <line x1={shown.x} x2={shown.x} y1={PAD.top} y2={HEIGHT - PAD.bottom} stroke="var(--color-ink-3)" strokeWidth={1} strokeDasharray="3 3" />
-          )}
-          <path d={path} fill="none" stroke="var(--color-pen)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-          {points.map((p, i) => (
-            <circle
-              key={p.record.id}
-              cx={p.x}
-              cy={p.y}
-              r={i === active ? 6 : 4.5}
-              fill="var(--color-pen)"
-              stroke="var(--color-card)"
-              strokeWidth={2}
-            />
-          ))}
-        </svg>
+      <div ref={setBox} className="relative mt-3" style={{ height: HEIGHT }}>
+        {width > 0 && (
+          <svg
+            width={width}
+            height={HEIGHT}
+            viewBox={`0 0 ${width} ${HEIGHT}`}
+            className="block touch-pan-y select-none"
+            role="img"
+            aria-label={summary}
+            onPointerMove={(e) => pick(e.clientX)}
+            onPointerDown={(e) => pick(e.clientX)}
+            onPointerLeave={(e) => {
+              if (e.pointerType === 'mouse') setActive(null)
+            }}
+          >
+            {scale.ticks.map((v, i) => (
+              <g key={v}>
+                <line x1={left} x2={plotRight} y1={y(v)} y2={y(v)} stroke="var(--color-line)" strokeWidth={1} />
+                <text x={left - 8} y={y(v) + 4} textAnchor="end" fontSize={FONT} fill="var(--color-ink-2)" className="tabular">
+                  {tickLabels[i]}
+                </text>
+              </g>
+            ))}
+            <text x={first.x} y={HEIGHT - 8} textAnchor="start" fontSize={FONT} fill="var(--color-ink-2)">
+              {formatDateShort(first.record.recorded_on)}
+            </text>
+            <text x={last.x} y={HEIGHT - 8} textAnchor="end" fontSize={FONT} fill="var(--color-ink-2)">
+              {formatDateShort(last.record.recorded_on)}
+            </text>
+            {shown && (
+              <line x1={shown.x} x2={shown.x} y1={PAD.top} y2={HEIGHT - PAD.bottom} stroke="var(--color-ink-3)" strokeWidth={1} strokeDasharray="3 3" />
+            )}
+            <path d={path} fill="none" stroke="var(--color-pen)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+            {points.map((p, i) => (
+              <circle
+                key={p.record.id}
+                cx={p.x}
+                cy={p.y}
+                r={i === active ? 7 : 5}
+                fill="var(--color-pen)"
+                stroke="var(--color-card)"
+                strokeWidth={2}
+              />
+            ))}
+          </svg>
+        )}
         {shown && (
           <div
             className="pointer-events-none absolute top-0 rounded-[var(--radius-field)] bg-ink px-3 py-2 text-sm text-white shadow-[var(--shadow-float)]"
             style={{
-              left: `${(shown.x / WIDTH) * 100}%`,
-              transform: `translateX(${shown.x > WIDTH / 2 ? 'calc(-100% - 10px)' : '10px'})`,
+              left: shown.x,
+              transform: `translateX(${shown.x > width / 2 ? 'calc(-100% - 12px)' : '12px'})`,
             }}
             role="status"
           >

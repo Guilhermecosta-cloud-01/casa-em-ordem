@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Copy, ListChecks, Pencil, Trash2, TrendingDown, TrendingUp } from 'lucide-react'
+import { Boxes, Copy, ListChecks, Pencil, Trash2, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
 import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { PageBody, PageHeader } from '@/app/AppLayout'
@@ -17,6 +17,7 @@ import { formatDate, formatMoney, formatMoneyInput, formatPercent, todayIso } fr
 import { normalizeText } from '@/lib/text'
 import { useUser } from '@/modules/auth/AuthProvider'
 import { useFamily } from '@/modules/family/FamilyProvider'
+import { addPurchaseToStock } from '@/modules/stock/hooks'
 import * as api from '../api'
 import { getCategory } from '../categories'
 import { compareAmounts, normalizedUnitPrice, previousSameName, purchaseAmount } from '../domain/history'
@@ -216,6 +217,8 @@ function PurchaseDetail({ purchase }: { purchase: Purchase }) {
           )}
         </section>
 
+        <PurchaseExtras purchase={purchase} />
+
         <div className="flex flex-wrap gap-2">
           {purchase.list_id && (
             <>
@@ -341,5 +344,50 @@ function EditPurchaseSheet({ open, onClose, purchase }: { open: boolean; onClose
         )}
       </form>
     </Sheet>
+  )
+}
+
+/** Depois da compra: somar ao estoque e lançar nas despesas. */
+function PurchaseExtras({ purchase }: { purchase: Purchase }) {
+  const toast = useToast()
+  const queryClient = useQueryClient()
+  const [busy, setBusy] = useState(false)
+  const applied = Boolean(purchase.stock_applied_at)
+  const amount = purchase.paid_total ?? purchase.estimated_total
+
+  async function addToStock() {
+    setBusy(true)
+    try {
+      const count = await addPurchaseToStock(purchase.id)
+      toast.success(
+        count === 0
+          ? 'Nenhum item desta compra está cadastrado no estoque.'
+          : count === 1
+            ? '1 item do estoque foi atualizado.'
+            : `${count} itens do estoque foram atualizados.`,
+      )
+      void queryClient.invalidateQueries({ queryKey: ['purchases'] })
+      void queryClient.invalidateQueries({ queryKey: ['purchase', purchase.id] })
+      void queryClient.invalidateQueries({ queryKey: ['stock'] })
+    } catch (e) {
+      toast.error(errorMessage(e))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const expenseLink = `/despesas?nova=1&descricao=${encodeURIComponent(purchase.name)}&valor=${encodeURIComponent(
+    String(amount),
+  )}&data=${purchase.purchased_on}&categoria=mercado&compra=${purchase.id}`
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      <Button variant="secondary" icon={<Boxes className="size-5" />} loading={busy} disabled={applied} onClick={() => void addToStock()}>
+        {applied ? 'Já somada ao estoque' : 'Somar ao estoque'}
+      </Button>
+      <ButtonLink to={expenseLink} variant="secondary" icon={<Wallet className="size-5" />}>
+        Lançar nas despesas
+      </ButtonLink>
+    </div>
   )
 }

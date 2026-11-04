@@ -11,7 +11,7 @@ import { EmptyState, ErrorState, LoadingBlock, Notice } from '@/components/ui/St
 import { cn } from '@/components/ui/cn'
 import { numberErrorMessage, parseBrNumber, toBig } from '@/lib/decimal'
 import { errorMessage } from '@/lib/errors'
-import { formatNumberInput } from '@/lib/format'
+import { formatNumber, formatNumberInput } from '@/lib/format'
 import { matchesSearch, normalizeText } from '@/lib/text'
 import { type Unit, UNIT_INFO, UNITS } from '@/lib/units'
 import { useProducts } from '@/modules/catalog/hooks'
@@ -204,7 +204,7 @@ function StockRow({
       <Stepper
         size="sm"
         label={`Quantidade de ${item.name}`}
-        value={<span className="sr-only">{quantityLabel(item)}</span>}
+        value={<span className="px-1 text-lg">{formatNumber(item.quantity)}</span>}
         canDecrement={toBig(item.quantity).gt(0)}
         onDecrement={() => onAdjust(-step)}
         onIncrement={() => onAdjust(step)}

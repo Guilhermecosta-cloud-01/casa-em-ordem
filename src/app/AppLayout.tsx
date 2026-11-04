@@ -9,11 +9,12 @@ import { CategoriesGate } from '@/modules/categories/CategoriesGate'
 import { useFamily } from '@/modules/family/FamilyProvider'
 import { BOTTOM_MODULES, MORE_MODULES, MORE_SETTINGS, NAV_MODULES } from '@/modules/registry'
 import { BrandMark } from './Brand'
-import { useNavBadges } from './navBadges'
+import { NavBadgesProvider, useNavBadges } from './navBadges'
 import { SyncStatus } from './SyncStatus'
 
 export function AppLayout() {
   return (
+    <NavBadgesProvider>
     <div className="min-h-dvh lg:flex">
       <SideNav />
       <div className="min-w-0 flex-1 pb-[calc(5.25rem+env(safe-area-inset-bottom))] lg:pb-10">
@@ -23,6 +24,7 @@ export function AppLayout() {
       </div>
       <BottomNav />
     </div>
+    </NavBadgesProvider>
   )
 }
 

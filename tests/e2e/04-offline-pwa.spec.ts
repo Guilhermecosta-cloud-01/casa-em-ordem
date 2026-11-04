@@ -97,7 +97,7 @@ test('18. instalável como PWA: manifesto, ícones e service worker', async ({ p
 
   await page.goto('/entrar')
   await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', /manifest\.webmanifest/)
-  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#2340A8')
+  await expect(page.locator('meta[name="theme-color"][media*="light"]')).toHaveAttribute('content', '#2340A8')
   const controlled = await page.evaluate(async () => {
     const registration = await navigator.serviceWorker.ready
     return Boolean(registration.active)

@@ -1,9 +1,10 @@
 # Casa em Ordem
 
-Aplicativo de organização familiar, começando pelas compras de supermercado:
-listas compartilhadas em tempo real, calculadora de custo-benefício por
-embalagem e histórico de preços. Funciona no navegador e pode ser instalado na
-tela inicial do Android e do iPhone (PWA).
+Aplicativo de organização familiar: compras de supermercado (listas
+compartilhadas em tempo real, calculadora de custo-benefício e histórico de
+preços), tarefas da casa, agenda, estoque, despesas e conversas da família.
+Funciona no navegador e pode ser instalado na tela inicial do Android e do
+iPhone (PWA).
 
 - **Listas de compras** compartilhadas pela família, com embalagens × conteúdo
   (3 pacotes de 5 kg = 15 kg), preço por embalagem ou por kg/L/unidade, totais,
@@ -12,10 +13,17 @@ tela inicial do Android e do iPhone (PWA).
   com simulação de quantidade equivalente em embalagens inteiras.
 - **Catálogo e histórico de preços**, alimentados automaticamente ao finalizar
   uma compra.
-- **Famílias com convites seguros**, papéis (administrador/integrante) e foto de
-  perfil.
-- **Uso offline limitado**: listas já abertas ficam no aparelho e alterações
-  feitas sem internet entram numa fila, com aviso de "pendente" até o servidor
+- **Tarefas** com responsável, prazo, prioridade, recorrência e histórico.
+- **Agenda** com compromissos, datas importantes, manutenções, reposições e
+  lembretes.
+- **Estoque** com estoque mínimo, alertas e envio para a lista de compras.
+- **Despesas** com divisão entre integrantes, saldos, acertos e resumo do mês.
+- **Conversas** no grupo da família e a dois, com mensagens não lidas.
+- **Notificações** dentro do app e no celular (Web Push).
+- **Famílias com convites seguros**, papéis (administrador/integrante), foto de
+  perfil, categorias personalizadas e modo escuro.
+- **Uso offline**: o que já foi aberto fica no aparelho e as alterações feitas
+  sem internet entram numa fila, com aviso de "pendente" até o servidor
   confirmar.
 
 ## Tecnologias
@@ -75,8 +83,17 @@ src/
     shopping/       listas, itens, totais, histórico de compras
     calculator/     calculadora de custo-benefício
     catalog/        produtos frequentes e histórico de preços
-    registry.ts     lista dos módulos (ativos e planejados)
+    tasks/          tarefas domésticas
+    agenda/         compromissos e lembretes
+    stock/          estoque doméstico
+    expenses/       despesas, divisão e saldos
+    chat/           conversas da família
+    notifications/  avisos e notificações no celular
+    categories/     categorias personalizadas
+    registry.ts     lista dos módulos e da navegação
   pwa/              aviso de atualização e instalação
+api/
+  push.ts           função da Vercel que envia as notificações ao celular
 supabase/
   migrations/       SQL versionado: tabelas, RLS, funções
   config.toml       configuração do Supabase CLI
@@ -93,6 +110,7 @@ docs/               configuração, publicação, decisões e limitações
 - [Configurar o Supabase](docs/SUPABASE.md)
 - [Publicar o aplicativo](docs/PUBLICACAO.md)
 - [Instalar no celular](docs/INSTALAR-NO-CELULAR.md) (para enviar à família)
+- [Notificações no celular](docs/NOTIFICACOES.md)
 - [Funcionalidades implementadas](docs/FUNCIONALIDADES.md)
 - [Limitações conhecidas](docs/LIMITACOES.md)
 - [Decisões técnicas](docs/DECISOES.md)
@@ -108,6 +126,7 @@ docs/               configuração, publicação, decisões e limitações
   `(id, family_id)`, então nem um identificador forjado aponta para outra
   família.
 - Ações sensíveis (criar família, convidar, aceitar convite, mudar papéis,
-  finalizar compra) são funções SQL que conferem a permissão no banco.
+  finalizar compra, dividir despesas, concluir tarefas, excluir conta) são
+  funções SQL que conferem a permissão no banco.
 - Convites usam token aleatório guardado só como hash, com validade, limite de
   usos e cancelamento.

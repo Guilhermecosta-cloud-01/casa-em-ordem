@@ -10,7 +10,7 @@ import { errorMessage } from '@/lib/errors'
 import { formatDateShort, formatPercent } from '@/lib/format'
 import { compareText, matchesSearch } from '@/lib/text'
 import { formatAmount } from '@/lib/units'
-import { CATEGORIES, getCategory } from '@/modules/shopping/categories'
+import { allCategories, getCategory } from '@/modules/shopping/categories'
 import { ProductFormSheet } from '../components/CatalogSheets'
 import { formatNormalized, productTrend } from '../domain/priceStats'
 import { useProductStats, useProducts } from '../hooks'
@@ -45,7 +45,7 @@ export function ProductsPage() {
   }, [products.data, stats.byProduct, category, search, view])
 
   const usedCategories = useMemo(
-    () => CATEGORIES.filter((c) => (products.data ?? []).some((p) => p.category === c.id)),
+    () => allCategories().filter((c) => (products.data ?? []).some((p) => p.category === c.id)),
     [products.data],
   )
   const ups = (stats.data ?? []).filter((s) => productTrend(s)?.trend === 'up').length

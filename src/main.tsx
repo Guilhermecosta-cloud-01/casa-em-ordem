@@ -12,6 +12,7 @@ import { toastFromOutside } from './components/ui/Toast'
 import { loadOutbox } from './lib/sync/outbox'
 import { supabase } from './lib/supabase'
 import { setupShoppingSync } from './modules/shopping/offline'
+import { registerModuleSync } from './modules/syncSetup'
 
 // A fila de sincronização é configurada antes de qualquer tela, para que
 // alterações guardadas offline sejam reenviadas assim que possível.
@@ -22,6 +23,7 @@ setupShoppingSync({
   },
   onFailure: (message) => toastFromOutside()?.error(message),
 })
+registerModuleSync()
 void loadOutbox()
 
 createRoot(document.getElementById('root')!).render(

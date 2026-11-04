@@ -46,6 +46,24 @@ const appRoutes: RouteObject[] = [
     path: 'familia',
     lazy: async () => ({ Component: (await import('@/modules/family/FamilyPage')).FamilyPage }),
   },
+  { path: 'mais', lazy: async () => ({ Component: (await import('./MorePage')).MorePage }) },
+  { path: 'tarefas', lazy: async () => ({ Component: (await import('@/modules/tasks/TasksPage')).TasksPage }) },
+  { path: 'estoque', lazy: async () => ({ Component: (await import('@/modules/stock/StockPage')).StockPage }) },
+  { path: 'despesas', lazy: async () => ({ Component: (await import('@/modules/expenses/ExpensesPage')).ExpensesPage }) },
+  { path: 'agenda', lazy: async () => ({ Component: (await import('@/modules/agenda/AgendaPage')).AgendaPage }) },
+  { path: 'conversas', lazy: async () => ({ Component: (await import('@/modules/chat/ConversationsPage')).ConversationsPage }) },
+  {
+    path: 'conversas/:conversationId',
+    lazy: async () => ({ Component: (await import('@/modules/chat/ChatPage')).ChatPage }),
+  },
+  {
+    path: 'notificacoes',
+    lazy: async () => ({ Component: (await import('@/modules/notifications/NotificationsPage')).NotificationsPage }),
+  },
+  {
+    path: 'categorias',
+    lazy: async () => ({ Component: (await import('@/modules/categories/CategoriesPage')).CategoriesPage }),
+  },
   {
     path: 'perfil',
     lazy: async () => ({ Component: (await import('@/modules/profile/ProfilePage')).ProfilePage }),

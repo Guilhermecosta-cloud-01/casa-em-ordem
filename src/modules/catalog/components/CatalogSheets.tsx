@@ -12,7 +12,7 @@ import { newId } from '@/lib/id'
 import { priceBasisLabel, UNIT_INFO, UNITS, type Unit } from '@/lib/units'
 import { useActiveFamily } from '@/modules/family/FamilyProvider'
 import { ensureStore } from '@/modules/shopping/api'
-import { CATEGORIES, guessCategory } from '@/modules/shopping/categories'
+import { allCategories, guessCategory } from '@/modules/shopping/categories'
 import { unitAcceptsContent } from '@/modules/shopping/domain/itemForm'
 import { lineTotal } from '@/modules/shopping/domain/totals'
 import { useLists, useStores } from '@/modules/shopping/hooks'
@@ -107,7 +107,7 @@ export function ProductFormSheet({
         />
         <div className="grid grid-cols-2 gap-3">
           <SelectField label="Categoria" value={category} onChange={(e) => setCategory(e.target.value)}>
-            {CATEGORIES.map((c) => (
+            {allCategories().map((c) => (
               <option key={c.id} value={c.id}>
                 {c.emoji} {c.label}
               </option>

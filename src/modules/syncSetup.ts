@@ -1,3 +1,4 @@
+import { eventSync } from './agenda/hooks'
 import { expenseSync } from './expenses/hooks'
 import { stockSync } from './stock/hooks'
 import { taskSync } from './tasks/hooks'
@@ -7,4 +8,5 @@ export function registerModuleSync() {
   taskSync.register()
   stockSync.register()
   expenseSync.register()
+  eventSync.register()
 }

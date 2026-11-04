@@ -1,6 +1,7 @@
 import { AppError, unwrap } from '@/lib/errors'
 import { newId } from '@/lib/id'
 import { supabase } from '@/lib/supabase'
+import { queueCreateList } from './offlineLists'
 import type { ListItem, ListSummary, Purchase, PurchaseItem, ShoppingList, Store } from './types'
 
 export type ListPatch = Partial<Pick<ShoppingList, 'name' | 'description' | 'list_date' | 'budget' | 'status'>>
@@ -40,20 +41,20 @@ export async function createList(input: {
   listDate?: string | null
   budget?: string | null
 }): Promise<ShoppingList> {
-  const row = unwrap(
-    await supabase
-      .from('shopping_lists')
-      .insert({
-        id: newId(),
-        family_id: input.familyId,
-        name: input.name.trim(),
-        description: input.description?.trim() || null,
-        list_date: input.listDate || null,
-        budget: input.budget ?? null,
-      })
-      .select()
-      .single(),
-  )
+  const values = {
+    id: newId(),
+    family_id: input.familyId,
+    name: input.name.trim(),
+    description: input.description?.trim() || null,
+    list_date: input.listDate || null,
+    budget: input.budget ?? null,
+  }
+  // Sem internet: a lista entra na fila e já pode receber itens.
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    const { data } = await supabase.auth.getSession()
+    return queueCreateList(values, data.session?.user.id ?? null)
+  }
+  const row = unwrap(await supabase.from('shopping_lists').insert(values).select().single())
   return row as ShoppingList
 }
 

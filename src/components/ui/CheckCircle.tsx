@@ -25,7 +25,7 @@ export function CheckCircle({
       <span
         className={cn(
           'flex size-8 items-center justify-center rounded-full border-[2.5px] transition-colors',
-          checked ? 'border-leaf bg-leaf text-white' : 'border-line-strong bg-card text-transparent',
+          checked ? 'border-leaf bg-leaf text-on-leaf' : 'border-line-strong bg-card text-transparent',
         )}
       >
         <Check className="size-5" strokeWidth={3.2} />

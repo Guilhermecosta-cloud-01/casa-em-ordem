@@ -133,7 +133,7 @@ export function Chip({
       aria-pressed={active}
       className={cn(
         'inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border-[1.5px] px-3.5 text-[0.9375rem] font-semibold transition-colors',
-        active ? 'border-pen bg-pen text-white' : 'border-line-strong bg-card text-ink hover:border-pen-line',
+        active ? 'border-pen bg-pen text-on-pen' : 'border-line-strong bg-card text-ink hover:border-pen-line',
         className,
       )}
     >

@@ -18,7 +18,7 @@ export function UpdatePrompt() {
     <div className="fixed inset-x-0 top-0 z-50 px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
       <div
         role="status"
-        className="mx-auto flex max-w-md items-center gap-3 rounded-[var(--radius-field)] bg-ink px-4 py-3 text-white shadow-[var(--shadow-float)]"
+        className="mx-auto flex max-w-md items-center gap-3 rounded-[var(--radius-field)] bg-night px-4 py-3 text-white shadow-[var(--shadow-float)]"
       >
         <RefreshCw className="size-5 shrink-0 text-tag" aria-hidden />
         <p className="min-w-0 flex-1 text-[0.9375rem]">Nova versão do app disponível.</p>

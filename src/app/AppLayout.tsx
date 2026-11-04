@@ -31,7 +31,7 @@ export function AppLayout() {
 function NavBadge({ count }: { count: number | undefined }) {
   if (!count) return null
   return (
-    <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-alert px-1.5 text-center text-[0.6875rem] font-bold leading-5 text-white">
+    <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-alert px-1.5 text-center text-[0.6875rem] font-bold leading-5 text-on-alert">
       {count > 99 ? '99+' : count}
       <span className="sr-only"> não lidas</span>
     </span>
@@ -114,7 +114,7 @@ function SideNav() {
                 <module.icon className="size-5" aria-hidden />
                 <span className="flex-1">{module.name}</span>
                 {badges[module.id] ? (
-                  <span className="rounded-full bg-alert px-2 text-xs font-bold leading-5 text-white">
+                  <span className="rounded-full bg-alert px-2 text-xs font-bold leading-5 text-on-alert">
                     {badges[module.id]}
                     <span className="sr-only"> não lidas</span>
                   </span>
@@ -138,7 +138,7 @@ function SideNav() {
                 <item.icon className="size-5" aria-hidden />
                 <span className="flex-1">{item.name}</span>
                 {item.id === 'notifications' && badges.notifications ? (
-                  <span className="rounded-full bg-alert px-2 text-xs font-bold leading-5 text-white">
+                  <span className="rounded-full bg-alert px-2 text-xs font-bold leading-5 text-on-alert">
                     {badges.notifications}
                     <span className="sr-only"> não lidas</span>
                   </span>

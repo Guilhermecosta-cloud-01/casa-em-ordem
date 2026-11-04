@@ -123,7 +123,7 @@ export function useExpenses(month: string) {
         .sort((a, b) => b.spent_on.localeCompare(a.spent_on) || b.created_at.localeCompare(a.created_at)),
     [rows, start, end],
   )
-  return { ...query, expenses, pendingIds }
+  return { ...query, expenses, pendingIds, offlineNoData: query.fetchStatus === 'paused' && query.data === undefined }
 }
 
 export function useMonthTotal(month: string) {

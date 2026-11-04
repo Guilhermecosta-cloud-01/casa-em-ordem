@@ -10,10 +10,10 @@ const base =
   'inline-flex items-center justify-center gap-2 rounded-[var(--radius-field)] font-semibold transition-colors select-none disabled:opacity-55 disabled:cursor-not-allowed'
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-pen text-white hover:bg-pen-hover active:bg-pen-hover',
+  primary: 'bg-pen text-on-pen hover:bg-pen-hover active:bg-pen-hover',
   secondary: 'bg-card text-pen border-[1.5px] border-pen-line hover:bg-pen-soft',
   ghost: 'bg-transparent text-pen hover:bg-pen-soft',
-  danger: 'bg-alert text-white hover:brightness-95',
+  danger: 'bg-alert text-on-alert hover:brightness-95',
   'quiet-danger': 'bg-transparent text-alert hover:bg-alert-soft',
 }
 

@@ -67,7 +67,7 @@ export function useTasks() {
     refetchInterval,
   })
   const { rows, pendingIds } = taskSync.useRows(family.id, query.data)
-  return { ...query, tasks: rows, pendingIds }
+  return { ...query, tasks: rows, pendingIds, offlineNoData: query.fetchStatus === 'paused' && query.data === undefined }
 }
 
 export function useTaskActions() {

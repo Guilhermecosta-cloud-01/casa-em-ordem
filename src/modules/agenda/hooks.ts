@@ -51,7 +51,7 @@ export function useEvents() {
     refetchInterval,
   })
   const { rows, pendingIds } = eventSync.useRows(family.id, query.data)
-  return { ...query, events: rows, pendingIds }
+  return { ...query, events: rows, pendingIds, offlineNoData: query.fetchStatus === 'paused' && query.data === undefined }
 }
 
 export function useEventLogs(eventId: string | null) {

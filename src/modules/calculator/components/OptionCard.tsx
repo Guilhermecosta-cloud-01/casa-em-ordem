@@ -33,7 +33,7 @@ export function OptionCard({
       <legend className="sr-only">Opção {letter}</legend>
       <div className="flex items-center gap-3">
         <p className="flex min-w-0 items-center gap-2 text-lg font-bold" aria-hidden>
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-pen font-tag text-lg text-white">{letter}</span>
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-pen font-tag text-lg text-on-pen">{letter}</span>
           Opção {letter}
           {option.name && <span className="truncate text-base font-normal text-ink-2">{option.name}</span>}
         </p>

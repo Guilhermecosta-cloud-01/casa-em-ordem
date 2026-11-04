@@ -6,7 +6,7 @@ import { Button, IconButton } from '@/components/ui/Button'
 import { PendingMark } from '@/components/ui/CheckCircle'
 import { useConfirm } from '@/components/ui/Confirm'
 import { PriceTag } from '@/components/ui/PriceTag'
-import { EmptyState, ErrorState, LoadingBlock } from '@/components/ui/States'
+import { EmptyState, ErrorState, LoadingBlock, Notice } from '@/components/ui/States'
 import { useToast } from '@/components/ui/Toast'
 import { cn } from '@/components/ui/cn'
 import { addMonths, startOfMonth } from '@/lib/dates'
@@ -25,7 +25,7 @@ import type { Expense } from './types'
 export function ExpensesPage() {
   const [params, setParams] = useSearchParams()
   const [month, setMonth] = useState(() => startOfMonth(params.get('data') ?? todayIso()))
-  const { expenses, pendingIds, isLoading, error, refetch } = useExpenses(month)
+  const { expenses, pendingIds, isLoading, error, refetch, offlineNoData } = useExpenses(month)
   const previous = useMonthTotal(addMonths(month, -1))
   const [editing, setEditing] = useState<Expense | 'new' | null>(() => (params.get('nova') ? 'new' : null))
   const [draft] = useState<ExpenseDraft | undefined>(() =>
@@ -79,7 +79,9 @@ export function ExpensesPage() {
           </IconButton>
         </div>
 
-        {isLoading && !expenses ? (
+        {offlineNoData && !expenses ? (
+          <Notice tone="info">Sem internet, e estes dados ainda não estão guardados neste aparelho. Eles aparecem quando a conexão voltar.</Notice>
+        ) : isLoading && !expenses ? (
           <LoadingBlock />
         ) : error && !expenses ? (
           <ErrorState message={errorMessage(error)} onRetry={() => void refetch()} />

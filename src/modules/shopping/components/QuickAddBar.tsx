@@ -119,7 +119,7 @@ export function QuickAddBar({
           aria-label="Adicionar"
           className={cn(
             'flex size-12 shrink-0 items-center justify-center rounded-full transition-colors',
-            parsed ? 'bg-pen text-white' : 'bg-line text-ink-3',
+            parsed ? 'bg-pen text-on-pen' : 'bg-line text-ink-3',
           )}
         >
           <Plus className="size-6" strokeWidth={2.6} />

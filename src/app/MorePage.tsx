@@ -40,7 +40,7 @@ export function MorePage() {
                     <span className="block text-sm text-ink-2">{item.description}</span>
                   </span>
                   {item.id === 'notifications' && badges.notifications ? (
-                    <span className="rounded-full bg-alert px-2 text-xs font-bold leading-5 text-white">
+                    <span className="rounded-full bg-alert px-2 text-xs font-bold leading-5 text-on-alert">
                       {badges.notifications}
                       <span className="sr-only"> não lidas</span>
                     </span>

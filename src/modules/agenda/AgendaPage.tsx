@@ -4,7 +4,7 @@ import { PageBody, PageHeader } from '@/app/AppLayout'
 import { Button, IconButton } from '@/components/ui/Button'
 import { CheckCircle, PendingMark } from '@/components/ui/CheckCircle'
 import { Badge, Segmented } from '@/components/ui/Controls'
-import { EmptyState, ErrorState, LoadingBlock } from '@/components/ui/States'
+import { EmptyState, ErrorState, LoadingBlock, Notice } from '@/components/ui/States'
 import { cn } from '@/components/ui/cn'
 import { addDays, addMonths, dayLabel, formatTime, monthLabel, startOfMonth } from '@/lib/dates'
 import { errorMessage } from '@/lib/errors'
@@ -23,7 +23,7 @@ const WEEKDAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']
 const WEEKDAY_NAMES = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado']
 
 export function AgendaPage() {
-  const { events, pendingIds, isLoading, error, refetch } = useEvents()
+  const { events, pendingIds, isLoading, error, refetch, offlineNoData } = useEvents()
   const { tasks } = useTasks()
   const taskActions = useTaskActions()
   const today = todayIso()
@@ -89,7 +89,9 @@ export function AgendaPage() {
           ]}
         />
 
-        {isLoading && !events ? (
+        {offlineNoData && !events ? (
+          <Notice tone="info">Sem internet, e estes dados ainda não estão guardados neste aparelho. Eles aparecem quando a conexão voltar.</Notice>
+        ) : isLoading && !events ? (
           <LoadingBlock />
         ) : error && !events ? (
           <ErrorState message={errorMessage(error)} onRetry={() => void refetch()} />
@@ -173,11 +175,11 @@ export function AgendaPage() {
                       className={cn(
                         'flex min-h-12 flex-col items-center justify-center gap-1 rounded-[var(--radius-field)] text-sm',
                         !inMonth && 'text-ink-3',
-                        selected ? 'bg-pen text-white' : date === today ? 'font-bold text-pen ring-1 ring-pen-line' : 'hover:bg-paper',
+                        selected ? 'bg-pen text-on-pen' : date === today ? 'font-bold text-pen ring-1 ring-pen-line' : 'hover:bg-paper',
                       )}
                     >
                       <span>{Number(date.slice(8))}</span>
-                      <span className={cn('h-1.5 w-1.5 rounded-full', count ? (selected ? 'bg-white' : 'bg-pen') : 'bg-transparent')} />
+                      <span className={cn('h-1.5 w-1.5 rounded-full', count ? (selected ? 'bg-on-pen' : 'bg-pen') : 'bg-transparent')} />
                     </button>
                   )
                 })}

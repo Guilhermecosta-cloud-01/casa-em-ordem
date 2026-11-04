@@ -22,7 +22,7 @@ export function ComparisonResults({ result }: { result: ComparisonResult }) {
     <div className="space-y-4">
       <p
         role="status"
-        className="rounded-[var(--radius-panel)] bg-ink px-4 py-4 text-[1.0625rem] font-semibold leading-snug text-white"
+        className="rounded-[var(--radius-panel)] bg-night px-4 py-4 text-[1.0625rem] font-semibold leading-snug text-white"
       >
         {result.message}
       </p>

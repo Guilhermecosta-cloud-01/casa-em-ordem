@@ -22,7 +22,7 @@ import { useStock, useStockActions } from './hooks'
 import type { StockFields, StockItem } from './types'
 
 export function StockPage() {
-  const { items, pendingIds, isLoading, error, refetch } = useStock()
+  const { items, pendingIds, isLoading, error, refetch, offlineNoData } = useStock()
   const actions = useStockActions()
   const [view, setView] = useState<'all' | 'low'>('all')
   const [search, setSearch] = useState('')
@@ -95,7 +95,9 @@ export function StockPage() {
           />
         </div>
 
-        {isLoading && !items ? (
+        {offlineNoData && !items ? (
+          <Notice tone="info">Sem internet, e estes dados ainda não estão guardados neste aparelho. Eles aparecem quando a conexão voltar.</Notice>
+        ) : isLoading && !items ? (
           <LoadingBlock />
         ) : error && !items ? (
           <ErrorState message={errorMessage(error)} onRetry={() => void refetch()} />

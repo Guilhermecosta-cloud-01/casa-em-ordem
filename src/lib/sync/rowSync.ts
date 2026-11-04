@@ -101,8 +101,11 @@ export function defineRowSync<T extends { id: string }>(def: {
     const { ops } = useOutbox()
     return useMemo(() => {
       const mine = ops.filter((op) => op.scope === scope(familyId))
+      // Sem nada carregado (ex.: offline num aparelho sem cache), o que foi
+      // feito agora ainda aparece.
+      const base = serverRows ?? (mine.some((op) => op.type === types.insert) ? [] : undefined)
       return {
-        rows: serverRows ? apply(serverRows, mine, familyId) : undefined,
+        rows: base ? apply(base, mine, familyId) : undefined,
         pendingIds: new Set(mine.map((op) => op.entityId)),
       }
     }, [ops, serverRows, familyId])

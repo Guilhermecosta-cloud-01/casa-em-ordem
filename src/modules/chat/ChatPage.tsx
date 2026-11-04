@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { Clock, SendHorizontal } from 'lucide-react'
 import { type FormEvent, type KeyboardEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router'
@@ -15,7 +16,7 @@ import { unwrap } from '@/lib/errors'
 import { useOnline } from '@/lib/sync/hooks'
 import { useAuth } from '@/modules/auth/AuthProvider'
 import { useFamily } from '@/modules/family/FamilyProvider'
-import { type ChatMessage, useChatActions, useChatOverview, useMarkRead, useMessages } from './hooks'
+import { type ChatMessage, messagesKey, useChatActions, useChatOverview, useMarkRead, useMessages } from './hooks'
 
 function dayTitle(iso: string): string {
   const day = iso.slice(0, 10)
@@ -40,7 +41,7 @@ export function ChatPage() {
   const { messages, pendingIds, isLoading, error, refetch, hasMore } = useMessages(conversationId)
   const actions = useChatActions()
   const { user } = useAuth()
-  const { nameOf } = useFamily()
+  const { nameOf, family } = useFamily()
   const toast = useToast()
   const online = useOnline()
   const [text, setText] = useState('')
@@ -66,6 +67,14 @@ export function ChatPage() {
     const ids = new Set((messages ?? []).map((m) => m.id))
     return [...older.filter((m) => !ids.has(m.id)), ...(messages ?? [])]
   }, [older, messages])
+
+  // Chegou mensagem nova (pelo tempo real ou pela consulta periódica da lista
+  // de conversas): recarrega esta conversa.
+  const queryClient = useQueryClient()
+  const lastAt = conversation?.last_message_at
+  useEffect(() => {
+    if (lastAt && family) void queryClient.invalidateQueries({ queryKey: messagesKey(family.id, conversationId) })
+  }, [lastAt, family, conversationId, queryClient])
 
   const lastServerId = useMemo(() => [...(messages ?? [])].reverse().find((m) => !pendingIds.has(m.id))?.id, [messages, pendingIds])
   useMarkRead(conversationId, lastServerId)
@@ -176,7 +185,7 @@ export function ChatPage() {
                       onClick={() => setMenu(m)}
                       className={cn(
                         'max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-left disabled:cursor-default',
-                        mine ? 'rounded-br-md bg-pen text-white' : 'rounded-bl-md bg-card ring-1 ring-line',
+                        mine ? 'rounded-br-md bg-pen text-on-pen' : 'rounded-bl-md bg-card ring-1 ring-line',
                         m.deleted_at && 'italic opacity-70',
                       )}
                     >
@@ -185,7 +194,7 @@ export function ChatPage() {
                       )}
                       <span className="sr-only">{mine ? 'Você' : nameOf(m.author_id, { you: false })}: </span>
                       {m.deleted_at ? 'Mensagem apagada' : m.body}
-                      <span className={cn('mt-0.5 flex items-center justify-end gap-1 text-[0.6875rem]', mine ? 'text-white/80' : 'text-ink-2')}>
+                      <span className={cn('mt-0.5 flex items-center justify-end gap-1 text-[0.6875rem]', mine ? 'text-on-pen/80' : 'text-ink-2')}>
                         {pending && <Clock className="size-3" aria-label="aguardando envio" />}
                         {timeOf(m.created_at)}
                       </span>

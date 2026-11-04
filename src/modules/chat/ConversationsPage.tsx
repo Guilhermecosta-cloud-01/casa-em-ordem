@@ -122,7 +122,7 @@ function ConversationRow({
           <span className="flex items-center justify-between gap-2">
             <span className={cn('truncate text-sm', unread ? 'font-semibold text-ink' : 'text-ink-2')}>{preview}</span>
             {unread > 0 && (
-              <span className="shrink-0 rounded-full bg-pen px-2 text-xs font-bold leading-5 text-white">
+              <span className="shrink-0 rounded-full bg-pen px-2 text-xs font-bold leading-5 text-on-pen">
                 {unread}
                 <span className="sr-only"> não lidas</span>
               </span>

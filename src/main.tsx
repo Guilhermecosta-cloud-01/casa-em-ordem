@@ -10,6 +10,7 @@ import './pwa/install'
 import { App } from './app/App'
 import { toastFromOutside } from './components/ui/Toast'
 import { loadOutbox } from './lib/sync/outbox'
+import { applyTheme, getTheme } from './lib/theme'
 import { supabase } from './lib/supabase'
 import { setupShoppingSync } from './modules/shopping/offline'
 import { registerModuleSync } from './modules/syncSetup'
@@ -23,6 +24,7 @@ setupShoppingSync({
   },
   onFailure: (message) => toastFromOutside()?.error(message),
 })
+applyTheme(getTheme())
 registerModuleSync()
 void loadOutbox()
 

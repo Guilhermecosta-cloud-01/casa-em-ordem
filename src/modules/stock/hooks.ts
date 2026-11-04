@@ -73,7 +73,7 @@ export function useStock() {
   const refetchInterval = usePollInterval(live)
   const query = useQuery({ queryKey: stockKey(family.id), queryFn: () => fetchStock(family.id), refetchInterval })
   const { rows, pendingIds } = stockSync.useRows(family.id, query.data)
-  return { ...query, items: rows?.map(withLow), pendingIds }
+  return { ...query, items: rows?.map(withLow), pendingIds, offlineNoData: query.fetchStatus === 'paused' && query.data === undefined }
 }
 
 export function useStockActions() {

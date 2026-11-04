@@ -7,7 +7,7 @@ import { useConfirm } from '@/components/ui/Confirm'
 import { Badge, Chip, Segmented } from '@/components/ui/Controls'
 import { SelectField, TextArea, TextField } from '@/components/ui/Field'
 import { Sheet } from '@/components/ui/Sheet'
-import { EmptyState, ErrorState, LoadingBlock } from '@/components/ui/States'
+import { EmptyState, ErrorState, LoadingBlock, Notice } from '@/components/ui/States'
 import { useToast } from '@/components/ui/Toast'
 import { cn } from '@/components/ui/cn'
 import { addDays } from '@/lib/dates'
@@ -23,7 +23,7 @@ import type { Task, TaskFields, TaskPriority } from './types'
 type View = 'open' | 'mine' | 'done'
 
 export function TasksPage() {
-  const { tasks, pendingIds, isLoading, error, refetch } = useTasks()
+  const { tasks, pendingIds, isLoading, error, refetch, offlineNoData } = useTasks()
   const actions = useTaskActions()
   const [view, setView] = useState<View>('open')
   const [editing, setEditing] = useState<Task | 'new' | null>(null)
@@ -103,7 +103,9 @@ export function TasksPage() {
           </form>
         )}
 
-        {isLoading && !tasks ? (
+        {offlineNoData && !tasks ? (
+          <Notice tone="info">Sem internet, e estes dados ainda não estão guardados neste aparelho. Eles aparecem quando a conexão voltar.</Notice>
+        ) : isLoading && !tasks ? (
           <LoadingBlock />
         ) : error && !tasks ? (
           <ErrorState message={errorMessage(error)} onRetry={() => void refetch()} />

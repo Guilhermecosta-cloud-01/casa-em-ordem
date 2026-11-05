@@ -20,6 +20,10 @@ export function ConfigMissing() {
         <code className="rounded bg-line/70 px-1">.env.example</code> com <strong>VITE_SUPABASE_URL</strong> e{' '}
         <strong>VITE_SUPABASE_ANON_KEY</strong> do seu projeto e reinicie o servidor. Detalhes em docs/SUPABASE.md.
       </p>
+      <p className="mt-3 text-ink-2">
+        No app publicado (Vercel ou Cloudflare), cadastre essas duas variáveis nas configurações do projeto e publique de novo: elas entram no
+        app na hora da publicação.
+      </p>
     </div>
   )
 }

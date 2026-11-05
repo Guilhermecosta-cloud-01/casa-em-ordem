@@ -85,9 +85,35 @@ RLS do perfil. Para fotos maiores, migrar para o Supabase Storage.
 - Atualização do app com aviso ("Nova versão disponível"), sem recarregar no meio
   de uma compra.
 
+## Módulos da etapa 6
+
+- **Recorrência** (tarefas e agenda): sempre "data-base + n × intervalo", igual
+  no app e no banco, para o fim do mês não escorregar (31/01 → 28/02 → 31/03).
+  Tarefas recorrentes criam a próxima ocorrência só ao serem concluídas, no
+  ritmo do prazo original e sempre depois de hoje.
+- **Despesas:** gravadas por uma função (`save_expense`) que confere a soma das
+  partes. Divisão igual em centavos, com o resto para os primeiros da lista,
+  igual no app e no banco. Saldos calculados por uma visão, considerando só
+  despesas divididas e acertos.
+- **Estoque:** ajustes por função que soma no banco (como os "+" das listas);
+  "somar a compra ao estoque" converte g/kg e mL/L e vale uma vez por compra.
+- **Conversas:** autor e horário vêm do servidor; conversas a dois guardam os
+  dois integrantes em ordem, então existe uma só por par.
+- **Notificações:** criadas por gatilhos no banco (a regra fica num lugar só,
+  vale para qualquer aparelho e não depende do app aberto). O envio ao celular é
+  uma função na Vercel (Node, biblioteca `web-push`), chamada pelo banco com
+  `pg_net` e um segredo; os lembretes saem de uma função agendada no `pg_cron`.
+  Sem essa configuração, os avisos continuam dentro do app.
+- **Categorias personalizadas:** guardadas por família e referenciadas pelo id
+  no mesmo campo de categoria; ao excluir, os itens voltam para "Outros".
+- **Modo escuro:** só troca as variáveis de cor; a escolha fica no aparelho.
+- **Fila offline genérica** (`defineRowSync`): os módulos novos reutilizam a
+  mesma fila das listas, com o mesmo indicador de pendente.
+
 ## Hospedagem
 
-Cloudflare Pages (estático e gratuito), com Vercel documentado como alternativa.
+Vercel (escolhida para a publicação) ou Cloudflare Pages; as duas configurações
+estão no repositório. A função de notificações (`api/push.ts`) roda na Vercel.
 Cabeçalhos de segurança, incluindo CSP, em `public/_headers` e `vercel.json`.
 
 ## Testes sem Docker

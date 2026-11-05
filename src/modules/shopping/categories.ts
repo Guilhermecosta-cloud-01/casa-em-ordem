@@ -24,11 +24,30 @@ export const CATEGORIES: readonly Category[] = [
   { id: 'outros', label: 'Outros', emoji: '🛒' },
 ]
 
-const BY_ID = new Map(CATEGORIES.map((c, index) => [c.id, { ...c, index }]))
-const FALLBACK = BY_ID.get('outros')!
+// Categorias criadas pela família (tabela item_categories), carregadas por
+// CategoriesGate. Ficam depois das do app e antes de "Outros".
+let custom: Category[] = []
+let ordered: Category[] = [...CATEGORIES]
+let byId = new Map(ordered.map((c, index) => [c.id, { ...c, index }]))
+
+function rebuild() {
+  const others = CATEGORIES.filter((c) => c.id !== 'outros')
+  ordered = [...others, ...custom, CATEGORIES.find((c) => c.id === 'outros')!]
+  byId = new Map(ordered.map((c, index) => [c.id, { ...c, index }]))
+}
+
+export function setCustomCategories(list: { id: string; label: string; emoji: string | null }[]) {
+  custom = list.map((c) => ({ id: c.id, label: c.label, emoji: c.emoji || '🏷️' }))
+  rebuild()
+}
+
+/** Todas as categorias: as do app, as da família e "Outros" no fim. */
+export function allCategories(): readonly Category[] {
+  return ordered
+}
 
 export function getCategory(id: string | null | undefined): Category & { index: number } {
-  return (id && BY_ID.get(id)) || FALLBACK
+  return (id && byId.get(id)) || byId.get('outros')!
 }
 
 // Palavras que indicam a categoria (sem acento, minúsculas). A primeira

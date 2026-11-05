@@ -2,39 +2,50 @@
 
 ## O que não foi testado aqui
 
-- **Projeto Supabase real e hospedagem.** O desenvolvimento usou um Supabase
-  local (Postgres + Supabase Auth + PostgREST reais). Antes de entregar à
-  família, faça a conferência rápida de [SUPABASE.md](SUPABASE.md), passo 6.
 - **Realtime.** O ambiente local de testes não tem o servidor do Realtime; a
-  sincronização entre duas pessoas foi testada pelo modo de consulta periódica.
-  O código do Realtime é o padrão do Supabase, mas precisa ser conferido no seu
-  projeto.
+  sincronização entre duas pessoas (listas, tarefas, conversas, avisos) foi
+  testada pelo modo de consulta periódica. O código do Realtime é o padrão do
+  Supabase, mas precisa ser conferido no seu projeto.
+- **Notificações no celular.** A função `api/push` foi testada contra o banco
+  local com o envio simulado; a entrega real depende das chaves e da
+  configuração de [NOTIFICACOES.md](NOTIFICACOES.md), e do celular (no iPhone,
+  só com o app instalado).
+- **Lembretes agendados:** o agendamento (pg_cron) é ligado pela última
+  migração; aqui foram testados chamando a função diretamente. O envio deles ao
+  celular depende do pg_net e da configuração de [NOTIFICACOES.md](NOTIFICACOES.md).
+- **Excluir a própria conta** apaga o usuário em `auth.users` por uma função do
+  banco. Testado no banco local; se o seu projeto recusar a exclusão, um
+  administrador apaga o usuário em *Authentication → Users*.
 - **E-mails** de confirmação de conta e de redefinição de senha (dependem do SMTP
-  do projeto).
+  do projeto; o gratuito do Supabase manda poucos por hora).
 - **Aparelhos reais.** Os testes rodaram em Chromium com tamanho de tela de
-  celular e de computador. Vale abrir em um Android e em um iPhone de verdade,
-  principalmente a instalação no iPhone, que só funciona pelo Safari.
+  celular e de computador.
 
 ## Comportamento
 
-- **Offline é limitado às listas.** Sem internet dá para ver o que já foi aberto
-  antes e alterar itens. Criar ou excluir listas, finalizar compras, convidar,
-  mexer no catálogo e salvar comparações exigem conexão (o app avisa).
-- Os outros integrantes só veem uma alteração offline depois que ela é enviada.
-- **Conflitos:** quando duas pessoas mudam o mesmo campo do mesmo item, vale a
-  última gravação. Campos diferentes não se sobrescrevem, "+" simultâneos se
-  somam e a tela de edição avisa se o item mudou enquanto estava aberta.
-- **Exclusões no Realtime:** o Supabase envia o aviso de item excluído a todos
-  os aparelhos conectados, contendo só o identificador do item (sem conteúdo);
-  cada aparelho ignora o que não é da lista aberta. Com muitas famílias no mesmo
-  projeto, isso gera tráfego extra.
+- **Offline:** funcionam sem internet os itens das listas, criar lista,
+  tarefas, estoque, despesas, agenda e envio de mensagens (tudo entra na fila e
+  sobe depois). Precisam de conexão: finalizar compra, catálogo e preços,
+  convites e família, acertos de despesas, categorias, apagar mensagem e marcar
+  avisos como lidos. Telas nunca abertas no aparelho não têm dados offline (o
+  app avisa).
+- **Conflitos:** quando duas pessoas mudam o mesmo campo do mesmo registro, vale
+  a última gravação. Campos diferentes não se sobrescrevem e os "+"/"−" de listas
+  e estoque se somam.
+- **Exclusões no Realtime:** o Supabase envia o aviso de registro excluído a
+  todos os aparelhos conectados, só com o identificador; cada aparelho ignora o
+  que não é seu.
+- **Conversas:** só texto (sem fotos, áudio ou edição de mensagem). Quem sai da
+  família deixa de ver as conversas; o histórico fica para quem continua.
+- **Despesas:** categorias fixas; uma pessoa que exclui a conta tem as partes
+  dela removidas dos saldos.
+- **Tarefas recorrentes:** cada ocorrência é uma tarefa, e a próxima só é criada
+  ao concluir a atual; para encerrar a repetição, exclua a tarefa em aberto.
+- **Agenda:** horários no fuso de Brasília; lembretes de "dia todo" usam 9h como
+  referência.
 - Sair da conta apaga os dados guardados no aparelho, inclusive alterações ainda
   não enviadas (o app avisa antes).
-- Não há exclusão da própria conta pelo app; um administrador do projeto faz isso
-  no painel do Supabase (*Authentication → Users*).
 - Foto de perfil reduzida para 192 px e guardada no banco (até ~150 KB).
-- Categorias são fixas (14). Personalizar categorias exige uma tabela nova.
-- Sem modo escuro.
 - Moeda e formatos apenas em reais e português do Brasil.
 
 ## Segurança
@@ -43,7 +54,8 @@
   painel). As funções de convite não têm limite próprio de tentativas; a
   segurança vem do token, com 244 bits aleatórios (impossível de adivinhar).
 - A política de segurança de conteúdo (CSP) aceita conexões com
-  `*.supabase.co`. Com domínio próprio no Supabase, ajuste `public/_headers`.
+  `*.supabase.co`. Com domínio próprio no Supabase, ajuste `public/_headers` e
+  `vercel.json`.
 
 ## Testes locais sem Docker
 

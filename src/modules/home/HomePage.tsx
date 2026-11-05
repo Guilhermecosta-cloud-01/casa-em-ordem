@@ -17,6 +17,7 @@ import { ListCard } from '@/modules/shopping/components/ListCard'
 import { LIST_TEMPLATES, ListFormSheet } from '@/modules/shopping/components/ListSheets'
 import { budgetStatus } from '@/modules/shopping/domain/totals'
 import { useListMutations, useLists, usePurchases, useSummaries } from '@/modules/shopping/hooks'
+import { TodayPanel } from './TodayPanel'
 
 export function HomePage() {
   const user = useUser()
@@ -95,6 +96,8 @@ export function HomePage() {
             </div>
           </EmptyState>
         )}
+
+        <TodayPanel />
 
         <nav aria-label="Atalhos" className="grid grid-cols-3 gap-2">
           <Shortcut icon={<ListPlus className="size-6" />} label="Nova lista" onClick={() => setCreating('')} />

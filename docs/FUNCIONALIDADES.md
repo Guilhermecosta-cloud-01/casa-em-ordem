@@ -115,18 +115,98 @@ Organizadas pelas seções da especificação.
 - O app não elege "estabelecimento mais barato"; mostra os últimos preços
   anotados em cada lugar e avisa quando os dados são poucos.
 
-## 9. Preparação para módulos futuros
+## 9. Módulos da família (etapa 6)
 
-- Registro de módulos (`src/modules/registry.ts`) com chat, tarefas, despesas,
-  agenda e estoque planejados, sem telas incompletas.
-- Guia para adicionar módulos com modelo de migração e RLS
-  ([MODULOS.md](MODULOS.md)).
+Todos aparecem no menu: Início, Listas, Conversas e Tarefas na barra inferior
+do celular; Calculadora, Agenda, Estoque, Despesas, Produtos e Família em
+**Mais** (no computador, tudo fica na barra lateral). O Início ganhou o quadro
+"Hoje na casa", com tarefas do dia, próximos compromissos, itens acabando,
+mensagens e avisos novos.
+
+### 9.1 Conversas
+
+- Grupo geral da família e conversas entre dois integrantes.
+- Mensagens de texto com data e horário, agrupadas por dia.
+- Indicador de não lidas na lista de conversas e na navegação.
+- Histórico guardado no banco, com "ver mensagens anteriores".
+- Apagar a própria mensagem (fica "Mensagem apagada").
+- Mensagens escritas sem internet vão quando a conexão voltar.
+- Notificações no celular (ver 9.6).
+
+### 9.2 Tarefas domésticas
+
+- Cadastro rápido ou completo: responsável, prazo, prioridade (baixa,
+  normal, alta), observações.
+- Recorrência diária, semanal, mensal ou anual, a cada N períodos: ao concluir,
+  a próxima ocorrência é criada no mesmo ritmo do prazo original.
+- Grupos por prazo: atrasadas, hoje, amanhã, próximos 7 dias, mais adiante e
+  sem prazo; filtro "Minhas".
+- Histórico das feitas (quem fez e quando) e "Desfazer".
+- Quem recebe uma tarefa é avisado; tarefas do dia geram lembrete.
+- Funciona sem internet.
+
+### 9.3 Despesas familiares
+
+- Lançamento com descrição, categoria (mercado, moradia, contas, transporte,
+  saúde, educação, lazer, pets, roupas, outros), valor, data, quem pagou e
+  quem lançou.
+- Divisão entre integrantes: não dividir, igual (os centavos que sobram vão
+  para os primeiros) ou valores diferentes (a soma precisa fechar).
+- "Quem deve a quem": saldos de todos os lançamentos divididos, com sugestão
+  de acertos e registro do pagamento.
+- Resumo mensal: total, comparação com o mês anterior, gastos por categoria e
+  por pessoa.
+- Na compra finalizada: "Lançar nas despesas" já preenchido.
+- Funciona sem internet (os acertos precisam de conexão).
+
+### 9.4 Agenda e lembretes
+
+- Compromissos (com horário, fim e local), datas importantes (repetem todo ano
+  e mostram quantos anos fazem), manutenção de equipamentos (com registro de
+  quando foi feita) e reposição de produtos (com "Pôr na lista de compras").
+- Recorrência com intervalo e data final; lembrete na hora, 15 min, 1 h, 1 dia,
+  2 dias ou 1 semana antes.
+- Tarefas com prazo aparecem na agenda, e dá para concluí-las de lá.
+- Visões "Próximos dias" (60 dias) e "Mês" (calendário).
+
+### 9.5 Estoque doméstico
+
+- Itens com quantidade, unidade, estoque mínimo, local (despensa, geladeira…),
+  categoria e observações; ligação automática com o produto do catálogo de
+  mesmo nome.
+- Botões − e + (somam no banco, sem perder toques simultâneos).
+- Alerta "Acabando"/"Acabou" e aviso para a família quando um item chega ao
+  mínimo.
+- "Pôr na lista": um item ou todos os que estão acabando, na quantidade que
+  falta.
+- Na compra finalizada: "Somar ao estoque" (com conversão g/kg e mL/L; vale uma
+  vez por compra).
+- Funciona sem internet.
+
+### 9.6 Notificações
+
+- Central de avisos no app (Mais → Notificações): tarefa atribuída, tarefa do
+  dia, item acabando, despesa dividida e lembretes da agenda.
+- No celular (Web Push), com o app fechado, depois da configuração descrita em
+  [NOTIFICACOES.md](NOTIFICACOES.md); cada pessoa escolhe o que receber.
+
+### 9.7 Outros
+
+- **Categorias personalizadas** (Mais → Categorias): criar, renomear,
+  reordenar e excluir; aparecem em listas, catálogo e estoque.
+- **Modo escuro**: automático (segue o celular), claro ou escuro, em Meu perfil.
+- **Excluir a própria conta**, em Meu perfil, com confirmação.
+- **Lista nova sem internet**: a lista e os itens incluídos nela sobem quando a
+  conexão voltar.
 
 ## 10. Banco de dados
 
 - Tabelas: profiles, families, family_members, family_invites, stores, products,
   shopping_lists, list_items, purchases, purchase_items, price_records,
-  price_comparisons e sync_receipts.
+  price_comparisons, sync_receipts, tasks, stock_items, expenses,
+  expense_shares, expense_settlements, events, event_logs, chat_conversations,
+  chat_messages, chat_reads, notifications, push_subscriptions,
+  notification_preferences e item_categories.
 - RLS em todas as tabelas; privilégios por coluna; chaves compostas
   `(id, family_id)`; funções auxiliares em esquema não exposto.
 - Auditoria automática: created_by/updated_by e datas preenchidos pelo banco.

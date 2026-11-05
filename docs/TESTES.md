@@ -4,8 +4,8 @@ Três camadas:
 
 | Camada | Comando | O que cobre |
 |---|---|---|
-| Unitários (Vitest) | `npm test` | Calculadora, conversões, totais, entrada de números, adição rápida, categorias, fila offline |
-| Banco (Vitest + Postgres) | `npm run test:db` | RLS, isolamento entre famílias, convites, papéis, funções, regras de arredondamento no SQL |
+| Unitários (Vitest) | `npm test` | Calculadora, conversões, totais, entrada de números, adição rápida, categorias, fila offline, recorrência, tarefas, estoque, divisão de despesas, agenda, envio de notificações |
+| Banco (Vitest + Postgres) | `npm run test:db` | RLS, isolamento entre famílias, convites, papéis, funções, arredondamento no SQL; tarefas, estoque, despesas, agenda, conversas, avisos, categorias, exclusão de conta e a função `api/push` |
 | Ponta a ponta (Playwright) | `npm run test:e2e` | Fluxos completos no navegador com dois usuários reais |
 
 ## Preparar o ambiente local
@@ -55,5 +55,15 @@ banco) e o `.env.local` (ponta a ponta) para o ambiente do Supabase CLI.
 | 17 | Perda de conexão | e2e `04` (teste 17: fila, recarregar offline, reenvio) |
 | 18 | Instalação e abertura como PWA | e2e `04` (teste 18: manifesto, ícones, service worker) |
 
+## Módulos da etapa 6 (`tests/e2e/05-modulos.spec.ts`)
+
+| Teste | O que cobre |
+|---|---|
+| Tarefas | Responsável, prazo, recorrência semanal, conclusão cria a próxima, histórico |
+| Estoque | Mínimo, alerta "Acabando", "Pôr todos na lista" e o item na lista |
+| Dois integrantes | Aviso de tarefa atribuída, despesa dividida e acerto, conversa no grupo com não lidas |
+| Agenda e conta | Compromisso com horário e lembrete, visão do mês, categoria personalizada, modo escuro, exclusão da conta |
+| Sem internet | Tarefa e lista nova com item ficam pendentes e sobem ao voltar |
+
 Ver [LIMITACOES.md](LIMITACOES.md) para o que não pôde ser testado neste ambiente
-(Realtime, e-mails, aparelhos reais).
+(Realtime, notificações no celular, e-mails, aparelhos reais).

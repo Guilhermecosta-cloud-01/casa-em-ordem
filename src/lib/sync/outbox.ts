@@ -96,8 +96,29 @@ async function persist() {
   }
 }
 
+/** Operações registradas por outros módulos (tarefas, estoque, conversas...). */
+interface Registration {
+  types: Set<string>
+  coalesce?: Coalescer
+  onSettled?: (scopes: Set<string>) => void
+}
+const registrations: Registration[] = []
+
+/**
+ * Acrescenta tipos de operação à fila (cada módulo registra os seus). A
+ * junção de operações redundantes e o aviso de conclusão valem só para os
+ * tipos do próprio registro.
+ */
+export function registerOpHandlers(
+  handlers: Record<string, OpHandler<any, any>>,
+  options: { coalesce?: Coalescer; onSettled?: (scopes: Set<string>) => void } = {},
+) {
+  config = { ...config, handlers: { ...config.handlers, ...handlers } }
+  registrations.push({ types: new Set(Object.keys(handlers)), ...options })
+}
+
 export function configureOutbox(next: OutboxConfig) {
-  config = next
+  config = { ...next, handlers: { ...config.handlers, ...next.handlers } }
 }
 
 export function subscribeOutbox(listener: () => void): () => void {
@@ -149,7 +170,9 @@ export function enqueue<P>(input: {
     attempts: 0,
     status: 'pending',
   }
-  const queue = config.coalesce ? config.coalesce([...state.ops], op) : [...state.ops, op]
+  const owner = registrations.find((r) => r.types.has(op.type))
+  const coalesce = owner ? owner.coalesce : config.coalesce
+  const queue = coalesce ? coalesce([...state.ops], op) : [...state.ops, op]
   emit({ ops: queue })
   void persist()
   void flushOutbox()
@@ -240,7 +263,10 @@ export async function flushOutbox(): Promise<void> {
     }
   } finally {
     emit({ flushing: false })
-    if (touched.size > 0) config.onSettled?.(touched)
+    if (touched.size > 0) {
+      config.onSettled?.(touched)
+      for (const registration of registrations) registration.onSettled?.(touched)
+    }
   }
 }
 

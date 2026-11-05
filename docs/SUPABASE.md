@@ -22,9 +22,16 @@ npx supabase db push                              # aplica as migrações penden
 
 **Opção B — Editor SQL do painel:** abra *SQL Editor*, cole o conteúdo de cada
 arquivo de `supabase/migrations/` (do mais antigo para o mais novo) e execute.
+São quatro arquivos: famílias, compras e catálogo, a etapa 6 (tarefas, estoque,
+despesas, agenda, conversas, notificações e categorias) e os lembretes
+automáticos (ativa o pg_cron e agenda os lembretes a cada 5 minutos). O da
+etapa 6 roda numa transação só: se der erro, nada fica pela metade.
 
-As migrações criam as tabelas, as políticas RLS, as funções e já adicionam
-`list_items` e `shopping_lists` à publicação do Realtime.
+As migrações criam as tabelas, as políticas RLS, as funções e já adicionam as
+tabelas que precisam de tempo real (listas, itens, tarefas, estoque, despesas,
+agenda, mensagens e avisos) à publicação do Realtime.
+
+Para as notificações no celular, veja também [NOTIFICACOES.md](NOTIFICACOES.md).
 
 ## 3. Autenticação
 

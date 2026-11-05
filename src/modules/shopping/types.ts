@@ -93,6 +93,7 @@ export interface Purchase {
   items_count: number
   purchased_count: number
   notes: string | null
+  stock_applied_at?: string | null
   created_by: string | null
   created_at: string
 }

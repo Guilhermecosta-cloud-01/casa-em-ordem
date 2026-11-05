@@ -40,7 +40,11 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         navigateFallback: '/index.html',
+        // Rotas da API (função de notificações na Vercel) não são páginas do app.
+        navigateFallbackDenylist: [/^\/api\//],
         cleanupOutdatedCaches: true,
+        // Recebe as notificações no celular (Web Push) e abre o app no lugar certo.
+        importScripts: ['push-sw.js'],
         // As requisições ao Supabase não passam pelo cache do service worker:
         // os dados offline ficam no cache do próprio app (IndexedDB), que sabe
         // distinguir o que já foi sincronizado do que está pendente.

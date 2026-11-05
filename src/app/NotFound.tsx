@@ -32,7 +32,7 @@ export function RouteErrorPage() {
       <button
         type="button"
         onClick={() => window.location.reload()}
-        className="mt-6 min-h-12 rounded-[var(--radius-field)] bg-pen px-5 font-semibold text-white"
+        className="mt-6 min-h-12 rounded-[var(--radius-field)] bg-pen px-5 font-semibold text-on-pen"
       >
         Recarregar
       </button>

@@ -139,7 +139,7 @@ export function PriceChart({
         )}
         {shown && (
           <div
-            className="pointer-events-none absolute top-0 rounded-[var(--radius-field)] bg-ink px-3 py-2 text-sm text-white shadow-[var(--shadow-float)]"
+            className="pointer-events-none absolute top-0 rounded-[var(--radius-field)] bg-night px-3 py-2 text-sm text-white shadow-[var(--shadow-float)]"
             style={{
               left: shown.x,
               transform: `translateX(${shown.x > width / 2 ? 'calc(-100% - 12px)' : '12px'})`,

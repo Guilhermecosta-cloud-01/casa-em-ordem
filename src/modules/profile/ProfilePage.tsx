@@ -1,17 +1,20 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Camera, Download, LogOut, Share, SquarePlus } from 'lucide-react'
+import { Camera, Download, LogOut, Share, SquarePlus, Trash2 } from 'lucide-react'
 import { type ChangeEvent, type FormEvent, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { PageBody, PageHeader } from '@/app/AppLayout'
 import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
 import { useConfirm } from '@/components/ui/Confirm'
+import { Segmented } from '@/components/ui/Controls'
 import { TextField } from '@/components/ui/Field'
 import { Notice } from '@/components/ui/States'
 import { useToast } from '@/components/ui/Toast'
 import { env } from '@/lib/env'
-import { errorMessage } from '@/lib/errors'
+import { errorMessage, unwrap } from '@/lib/errors'
+import { supabase } from '@/lib/supabase'
 import { pendingCountFor } from '@/lib/sync/outbox'
+import { getTheme, setTheme, type ThemeChoice } from '@/lib/theme'
 import { useAuth, useUser } from '@/modules/auth/AuthProvider'
 import { updateProfile } from '@/modules/family/api'
 import { useFamily } from '@/modules/family/FamilyProvider'
@@ -87,6 +90,31 @@ export function ProfilePage() {
       toast.error(errorMessage(e))
     } finally {
       setPhotoBusy(false)
+    }
+  }
+
+  const [theme, setThemeChoice] = useState<ThemeChoice>(getTheme)
+  const [deleting, setDeleting] = useState(false)
+
+  async function onDeleteAccount() {
+    const ok = await confirm({
+      title: 'Excluir sua conta?',
+      message: 'Para confirmar, digite EXCLUIR. Se você for a única pessoa administradora de uma família com outras pessoas, passe a administração antes.',
+      confirmLabel: 'Excluir conta',
+      tone: 'danger',
+      requireText: 'EXCLUIR',
+    })
+    if (!ok) return
+    setDeleting(true)
+    try {
+      unwrap(await supabase.rpc('delete_my_account'))
+      await signOut()
+      navigate('/entrar', { replace: true })
+      toast.success('Sua conta foi excluída.')
+    } catch (e) {
+      toast.error(errorMessage(e))
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -166,11 +194,44 @@ export function ProfilePage() {
           </section>
         )}
 
+        <section aria-labelledby="aparencia" className="space-y-2">
+          <h2 id="aparencia" className="text-lg font-bold">
+            Aparência
+          </h2>
+          <Segmented
+            label="Aparência"
+            value={theme}
+            onChange={(value) => {
+              setThemeChoice(value)
+              setTheme(value)
+            }}
+            options={[
+              { value: 'system', label: 'Automática' },
+              { value: 'light', label: 'Clara' },
+              { value: 'dark', label: 'Escura' },
+            ]}
+          />
+          <p className="text-sm text-ink-2">Automática segue o modo claro ou escuro do celular. Vale só para este aparelho.</p>
+        </section>
+
         <section className="space-y-3">
           <Button variant="secondary" icon={<LogOut className="size-5" />} onClick={() => void onSignOut()}>
             Sair da conta
           </Button>
           <Notice>Versão {env.appVersion}</Notice>
+        </section>
+
+        <section aria-labelledby="excluir-conta" className="space-y-2 border-t border-line pt-6">
+          <h2 id="excluir-conta" className="text-lg font-bold">
+            Excluir minha conta
+          </h2>
+          <p className="text-sm text-ink-2">
+            Apaga seu acesso, seu perfil e as famílias em que você é a única pessoa. Nas outras famílias, o que você cadastrou continua (sem o
+            seu nome). Não dá para desfazer.
+          </p>
+          <Button variant="quiet-danger" icon={<Trash2 className="size-5" />} loading={deleting} onClick={() => void onDeleteAccount()}>
+            Excluir minha conta
+          </Button>
         </section>
       </PageBody>
     </>

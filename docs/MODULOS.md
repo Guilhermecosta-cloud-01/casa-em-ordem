@@ -1,8 +1,8 @@
 # Como adicionar um módulo
 
-Os próximos módulos (conversas, tarefas, despesas, agenda, estoque) já estão
-registrados em `src/modules/registry.ts` com `status: 'planned'`: aparecem no
-planejamento, mas não na navegação.
+Os módulos ficam registrados em `src/modules/registry.ts`. Os de exemplo mais
+completos para copiar são `src/modules/tasks` (tabela simples com fila offline)
+e `src/modules/stock` (com função SQL de ajuste e envio para a lista).
 
 ## 1. Banco de dados
 
@@ -85,17 +85,24 @@ src/modules/tasks/
 
 - Família ativa: `useActiveFamily()`; nomes e fotos: `useFamily().nameOf(id)`.
 - Componentes de interface prontos em `src/components/ui/`.
-- Para funcionar offline, registre operações na fila (`src/lib/sync/outbox.ts`)
-  como em `src/modules/shopping/offline.ts`; para leitura offline, inclua a chave
-  da consulta em `PERSISTED_KEYS` (`src/lib/queryClient.ts`).
+- Para funcionar offline, use `defineRowSync` (`src/lib/sync/rowSync.ts`):
+  inclusão, alteração e exclusão entram na fila e aparecem na hora como
+  pendentes. Registre o módulo em `src/modules/syncSetup.ts`. Para leitura
+  offline, inclua a chave da consulta em `PERSISTED_KEYS`
+  (`src/lib/queryClient.ts`).
+- Tempo real: `useTableRealtime` e `usePollInterval` (`src/lib/realtime.ts`),
+  com consulta periódica quando o Realtime não conecta.
+- Avisos: crie notificações no banco com `app_private.notify(...)` dentro de um
+  gatilho (veja os exemplos na migração da etapa 6); o envio ao celular é
+  automático.
 
 ## 3. Rotas e navegação
 
 1. Adicione as rotas em `src/app/router.tsx` (com `lazy` para carregar sob demanda).
 2. Em `src/modules/registry.ts`, mude o módulo para `status: 'active'`.
-3. A navegação inferior já usa os 5 espaços que cabem bem no celular. Ao ativar
-   o primeiro módulo novo, troque o último item por "Mais": uma tela com
-   Família e os demais módulos ativos.
+3. Módulos com `bottomNav: true` ficam na barra inferior do celular (cabem 4,
+   mais o "Mais"); os demais aparecem em **Mais** e na barra lateral do
+   computador, sem nenhuma alteração extra.
 
 ## 4. Testes
 

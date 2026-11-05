@@ -5,7 +5,7 @@ import { Segmented } from '@/components/ui/Controls'
 import { Big, parseBrNumber } from '@/lib/decimal'
 import { formatMoney, formatNumberInput } from '@/lib/format'
 import { priceBasisLabel, UNIT_INFO, UNITS, type Unit } from '@/lib/units'
-import { CATEGORIES, guessCategory } from '../categories'
+import { allCategories, guessCategory } from '../categories'
 import { type ItemFormErrors, type ItemFormState, showsPriceBasis, unitAcceptsContent } from '../domain/itemForm'
 import { describeContentTotal, lineTotal } from '../domain/totals'
 
@@ -74,7 +74,7 @@ export function ItemFields({
 
       <div className="grid grid-cols-2 gap-3">
         <SelectField label="Categoria" value={state.category} onChange={(e) => set('category', e.target.value)}>
-          {CATEGORIES.map((c) => (
+          {allCategories().map((c) => (
             <option key={c.id} value={c.id}>
               {c.emoji} {c.label}
             </option>

@@ -37,6 +37,13 @@
   --color-amber: #8f5300;
   --color-amber-soft: #fff3d6;
 
+  /* Texto sobre as cores cheias (botões, selos, marcações). */
+  --color-on-pen: #ffffff;
+  --color-on-leaf: #ffffff;
+  --color-on-alert: #ffffff;
+  /* Superfície sempre escura (avisos rápidos, destaque da calculadora). */
+  --color-night: #16213b;
+
   --radius-chip: 999px;
   --radius-field: 12px;
   --radius-panel: 18px;
@@ -164,5 +171,70 @@
   }
   .safe-top {
     padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* ------------------------------------------------------------------------
+   Modo escuro: segue o sistema, ou a escolha feita em Meu perfil
+   (data-theme="light" | "dark" no <html>).
+   ------------------------------------------------------------------------ */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-paper: #0e131d;
+  --color-card: #171e2c;
+  --color-ink: #e7ebf3;
+  --color-ink-2: #b3bccd;
+  --color-ink-3: #8e98ad;
+  --color-line: #283247;
+  --color-line-strong: #3a4761;
+  --color-pen: #8ea6ff;
+  --color-pen-hover: #a9bbff;
+  --color-pen-soft: #1d2a4d;
+  --color-pen-line: #33447a;
+  --color-on-pen: #0b1330;
+  --color-leaf: #56c98d;
+  --color-leaf-soft: #13301f;
+  --color-on-leaf: #06200f;
+  --color-alert: #ff8b7e;
+  --color-alert-soft: #3a1714;
+  --color-on-alert: #2a0703;
+  --color-amber: #f5b54a;
+  --color-amber-soft: #33270f;
+  --color-night: #232f4d;
+  --shadow-float: 0 10px 30px -12px rgb(0 0 0 / 0.7);
+  --shadow-sheet: 0 -12px 40px -16px rgb(0 0 0 / 0.7);
+}
+
+@media (prefers-color-scheme: dark) {
+
+  /* ------------------------------------------------------------------------
+     Modo escuro: segue o sistema, ou a escolha feita em Meu perfil
+     (data-theme="light" | "dark" no <html>).
+     ------------------------------------------------------------------------ */
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --color-paper: #0e131d;
+    --color-card: #171e2c;
+    --color-ink: #e7ebf3;
+    --color-ink-2: #b3bccd;
+    --color-ink-3: #8e98ad;
+    --color-line: #283247;
+    --color-line-strong: #3a4761;
+    --color-pen: #8ea6ff;
+    --color-pen-hover: #a9bbff;
+    --color-pen-soft: #1d2a4d;
+    --color-pen-line: #33447a;
+    --color-on-pen: #0b1330;
+    --color-leaf: #56c98d;
+    --color-leaf-soft: #13301f;
+    --color-on-leaf: #06200f;
+    --color-alert: #ff8b7e;
+    --color-alert-soft: #3a1714;
+    --color-on-alert: #2a0703;
+    --color-amber: #f5b54a;
+    --color-amber-soft: #33270f;
+    --color-night: #232f4d;
+    --shadow-float: 0 10px 30px -12px rgb(0 0 0 / 0.7);
+    --shadow-sheet: 0 -12px 40px -16px rgb(0 0 0 / 0.7);
   }
 }

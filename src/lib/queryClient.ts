@@ -31,6 +31,15 @@ export const queryClient = new QueryClient({
 
 /** Chaves de consulta que ficam salvas no aparelho para uso offline. */
 const PERSISTED_KEYS = new Set([
+  'tasks',
+  'stock',
+  'expenses',
+  'expense-balances',
+  'agenda',
+  'chat-overview',
+  'chat-messages',
+  'notifications',
+  'categories',
   'families',
   'members',
   'lists',

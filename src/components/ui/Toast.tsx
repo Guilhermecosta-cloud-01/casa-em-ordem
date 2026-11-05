@@ -70,9 +70,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             role={toast.tone === 'error' ? 'alert' : 'status'}
             className={cn(
               'pointer-events-auto flex w-full max-w-md animate-sheet-in items-center gap-3 rounded-[var(--radius-field)] px-4 py-3 text-white shadow-[var(--shadow-float)]',
-              toast.tone === 'success' && 'bg-ink',
-              toast.tone === 'info' && 'bg-ink',
-              toast.tone === 'error' && 'bg-alert',
+              toast.tone === 'success' && 'bg-night',
+              toast.tone === 'info' && 'bg-night',
+              toast.tone === 'error' && 'bg-[#b42318]',
             )}
           >
             {toast.tone === 'success' && <CheckCircle2 className="size-5 shrink-0 text-[#8fe3b6]" aria-hidden />}

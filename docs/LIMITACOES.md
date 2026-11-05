@@ -10,8 +10,9 @@
   local com o envio simulado; a entrega real depende das chaves e da
   configuração de [NOTIFICACOES.md](NOTIFICACOES.md), e do celular (no iPhone,
   só com o app instalado).
-- **Lembretes agendados** dependem do pg_cron e do pg_net no seu projeto
-  Supabase (testados aqui chamando a função diretamente).
+- **Lembretes agendados:** o agendamento (pg_cron) é ligado pela última
+  migração; aqui foram testados chamando a função diretamente. O envio deles ao
+  celular depende do pg_net e da configuração de [NOTIFICACOES.md](NOTIFICACOES.md).
 - **Excluir a própria conta** apaga o usuário em `auth.users` por uma função do
   banco. Testado no banco local; se o seu projeto recusar a exclusão, um
   administrador apaga o usuário em *Authentication → Users*.

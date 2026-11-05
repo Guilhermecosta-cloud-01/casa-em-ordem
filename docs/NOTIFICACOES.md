@@ -43,7 +43,9 @@ Depois, em *Deployments*, faça **Redeploy**.
 
 ## 3. Ligar o banco à função
 
-No Supabase, em *Database → Extensions*, ative **pg_net** e **pg_cron**.
+No Supabase, em *Database → Extensions*, ative **pg_net**. (O **pg_cron**, que
+gera os lembretes da agenda e das tarefas do dia a cada 5 minutos, já é ativado
+pela migração `20261105120000_lembretes_automaticos.sql`.)
 
 Depois, no *SQL Editor*, rode (trocando o endereço e o segredo):
 
@@ -52,9 +54,6 @@ insert into app_private.settings (key, value) values
   ('push_webhook_url', 'https://SEU-APP.vercel.app/api/push'),
   ('push_webhook_secret', 'O_SEGREDO_DO_PASSO_1')
 on conflict (key) do update set value = excluded.value;
-
--- Lembretes da agenda e tarefas do dia, a cada 5 minutos.
-select cron.schedule('casa-em-ordem-lembretes', '*/5 * * * *', $$select app_private.enqueue_reminders()$$);
 ```
 
 Ninguém do app consegue ler a tabela `app_private.settings`; só o banco usa o
